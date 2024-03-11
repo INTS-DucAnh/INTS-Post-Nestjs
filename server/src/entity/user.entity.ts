@@ -11,6 +11,9 @@ export class Users {
   @Column('text', { nullable: false })
   lastname: string;
 
+  @Column('text', { nullable: true })
+  gender: string;
+
   @Column('date', { nullable: true })
   birthday: Date;
 
@@ -20,6 +23,12 @@ export class Users {
   @Column({ nullable: false })
   roleid: number;
 
-  @Column('text', { nullable: true })
-  description: string;
+  @Column('varchar', { nullable: false, unique: true })
+  username: string;
+
+  @Column('boolean', { nullable: false, default: false })
+  online: boolean;
+
+  @Column('varchar', { nullable: false })
+  password: string;
 }
