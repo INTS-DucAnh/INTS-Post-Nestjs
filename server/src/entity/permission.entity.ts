@@ -6,10 +6,10 @@ export class Permissions {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('character', { nullable: false })
+  @Column('text', { nullable: false })
   action: string;
 
-  @Column('character', { nullable: false })
+  @Column('text', { nullable: false })
   target: string;
 
   @ManyToMany(() => Roles, (roles: Roles) => roles.permissions)
