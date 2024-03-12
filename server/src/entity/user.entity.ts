@@ -14,7 +14,7 @@ export class Users {
   @Column('text', { nullable: true })
   gender: string;
 
-  @Column('date', { nullable: true })
+  @Column('date', { nullable: true, default: '1990/01/01' })
   birthday: Date;
 
   @Column('text', { nullable: true })

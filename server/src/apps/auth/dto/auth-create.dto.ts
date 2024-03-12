@@ -1,7 +1,8 @@
+type Gender = 'M' | 'F' | 'O';
 export type CreateUserDto = {
   username: string;
   password: string;
-  gender: string;
+  gender: Gender;
   firstname: string;
   lastname: string;
   avatar?: string;

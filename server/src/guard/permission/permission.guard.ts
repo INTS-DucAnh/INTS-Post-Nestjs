@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { PermissionService } from 'src/apps/permission/permission.service';
+import { ActionsDto } from './actions.dto';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
@@ -12,16 +13,20 @@ export class PermissionGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const requiredActions = this.reflector.get<
-      Array<{ target: string; action: string[] }>
-    >('actions', context.getHandler());
+    const requiredActions = this.reflector.get<ActionsDto[]>(
+      'actions',
+      context.getHandler(),
+    );
     if (!requiredActions) {
       return true; // If route doesn't require any permission, allow access
     }
 
     const request = context.switchToHttp().getRequest();
-    const userId = request.user.id;
+    // const userId = request.user.id;
 
-    return this.permissionService.validAction(2, requiredActions);
+    return this.permissionService.validAction(
+      request.user.roleid,
+      requiredActions,
+    );
   }
 }
