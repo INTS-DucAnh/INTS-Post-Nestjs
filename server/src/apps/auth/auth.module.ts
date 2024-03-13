@@ -18,5 +18,6 @@ import { TimeUtil } from './utils/time.util';
     RefreshTokenStrategy,
     TimeUtil,
   ],
+  exports: [TimeUtil],
 })
 export class AuthModule {}

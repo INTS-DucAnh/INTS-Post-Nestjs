@@ -4,18 +4,24 @@ import {
   Delete,
   ForbiddenException,
   Get,
-  Patch,
+  Param,
   Post,
+  Put,
   Query,
   Req,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { UpdateCategoryDto } from './dto/category-update.dto';
 import { UserInRequest } from 'src/config/req-res.config';
-import { CreateCategoryDto } from './dto/category-create.dto';
+import { FormCreateCategoryDto } from './dto/category-create.dto';
 import { UserServices } from '../user/user.service';
 import { PermissionService } from '../permission/permission.service';
+import { ResponseInterceptor } from 'src/interceptor/response.interceptor';
+import { AccessTokenGuard } from 'src/guard/jwt/accesstoken.guard';
 
+@UseInterceptors(new ResponseInterceptor())
 @Controller('/category')
 export class CategoryController {
   constructor(
@@ -24,48 +30,58 @@ export class CategoryController {
     private readonly permissionService: PermissionService,
   ) {}
 
-  @Get('/get')
+  @Get('/')
   getCategory(@Query('skip') skip: number, @Query('limit') limit: number = 10) {
     return this.categoryService.findCategory(skip, limit);
   }
 
-  @Patch('/update')
+  @UseGuards(AccessTokenGuard)
+  @Put('/')
   async updateCategory(
     @Body() updateCategory: UpdateCategoryDto,
     @Req() req: UserInRequest,
   ) {
-    const [validCate, _, isAdmin] = await Promise.all([
-      this.categoryService.isValidCategory(updateCategory.id),
-      this.userService.checkValidUser(req.user.id),
-      this.permissionService.isAdmin(req.user.roleid),
-    ]);
+    const validCate = await this.categoryService.isValidCategory(
+      updateCategory.id,
+    );
 
-    if (validCate.createby === req.user.id || isAdmin) {
+    if (validCate.createby === req.user.id || req.user.isAdmin) {
       const [updateby, updateat] = [req.user.id, new Date()];
       return this.categoryService.updateCategory({
-        updateby,
-        updateat,
         ...validCate,
         ...updateCategory,
+        updateby: updateby,
+        updateat: updateat,
       });
     } else
       throw new ForbiddenException("You don't have permission to do this!");
   }
 
-  @Post('/create')
+  @UseGuards(AccessTokenGuard)
+  @Post('/')
   async createCategory(
-    @Body() createCategory: CreateCategoryDto,
+    @Body() createCategory: FormCreateCategoryDto,
     @Req() req: UserInRequest,
   ) {
     const valid = await this.userService.checkValidUser(req.user.id);
 
-    return this.categoryService.createCategory(createCategory);
+    const createDate = new Date();
+
+    return this.categoryService.createCategory({
+      ...createCategory,
+      createat: createDate,
+      updateat: createDate,
+      updateby: req.user.id,
+      createby: req.user.id,
+    });
   }
 
-  @Delete('/delete')
-  async deleteCategory(@Query('cid') cid: number, @Req() req: UserInRequest) {
-    const existCategory = await this.categoryService.isValidCategory(cid);
-    if (existCategory.createby === req.user.id || req.user.roleid === 1) {
+  @UseGuards(AccessTokenGuard)
+  @Delete('/:id')
+  async deleteCategory(@Param('id') cid: number, @Req() req: UserInRequest) {
+    const validCate = await this.categoryService.isValidCategory(cid);
+
+    if (validCate.createby === req.user.id || req.user.isAdmin) {
       return this.categoryService.deleteCategory(cid);
     } else
       throw new ForbiddenException("You don't have permission to do this!");

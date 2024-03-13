@@ -6,5 +6,5 @@ export type ViewPostDto = {
   updateby?: number;
   updateat: Date;
   createat: Date;
-  deleted: boolean;
+  deletedat: Date;
 };

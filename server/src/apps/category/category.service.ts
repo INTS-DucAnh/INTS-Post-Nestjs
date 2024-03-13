@@ -35,7 +35,7 @@ export class CategoryService {
   }
 
   deleteCategory(id: number) {
-    return this.categoryRepository.delete({ id: id });
+    return this.categoryRepository.softDelete({ id: id });
   }
 
   findCategory(skip: number, limit: number = 10) {

@@ -12,6 +12,19 @@ export class PostService {
     @InjectRepository(Posts) private readonly postRepository: Repository<Posts>,
   ) {}
 
+  async findPost(skip: number, limit: number) {
+    const query = this.postRepository.createQueryBuilder('posts');
+
+    const [maxPage, findRes] = await Promise.all([
+      query.getCount(),
+      query.skip(skip).limit(limit).getMany(),
+    ]);
+    return {
+      posts: findRes,
+      max: maxPage,
+    };
+  }
+
   async getPostById(pid: number) {
     return this.postRepository.findOneBy({ id: pid });
   }
@@ -38,14 +51,20 @@ export class PostService {
   }
 
   async createPost(createPost: CreatePostDto) {
-    return this.postRepository.save(createPost);
+    const update = await this.postRepository.save(createPost);
+
+    return update;
   }
 
-  async updatePost(updatePost: UpdatePostDto) {
+  async updatePost(
+    updatePost: ViewPostDto,
+    images: string[],
+    categories: number[],
+  ) {
     return this.postRepository.save(updatePost);
   }
 
   async deletePost(deletePost: ViewPostDto) {
-    return this.postRepository.save({ ...deletePost, deleted: true });
+    return this.postRepository.softDelete(deletePost);
   }
 }

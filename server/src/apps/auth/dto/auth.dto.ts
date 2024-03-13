@@ -1,7 +1,11 @@
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsStrongPassword } from 'class-validator';
 
-export type AuthDto = {
+export class AuthDto {
+  @IsNotEmpty()
+  @IsString()
   username: string;
 
+  @IsNotEmpty()
+  @IsStrongPassword()
   password: string;
-};
+}

@@ -6,6 +6,7 @@ import {
   Post,
   Req,
   Res,
+  Session,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -19,6 +20,7 @@ import { RefreshTokenGuard } from 'src/guard/jwt/refreshtoken.guard';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { TimeUtil } from './utils/time.util';
+import { RolesIdEnum } from 'src/guard/permission/roles.enum';
 
 @UseInterceptors(new ResponseInterceptor())
 @Controller('auth')
@@ -31,7 +33,7 @@ export class AuthController {
 
   @Post('signup')
   signup(@Body() createUserDto: CreateUserDto) {
-    return this.authService.signup(createUserDto, 2);
+    return this.authService.signup(createUserDto, RolesIdEnum.EDITOR);
   }
 
   @Post('login')
@@ -40,9 +42,6 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const { accessToken, refreshToken } = await this.authService.login(data);
-    console.log(
-      this.timeUtil.caltime(this.configService.get<string>('COOKIES_EXPIRE')),
-    );
     res.cookie(this.configService.get<string>('COOKIES_NAME'), refreshToken, {
       maxAge: this.timeUtil.caltime(
         this.configService.get<string>('COOKIES_EXPIRE'),
@@ -57,13 +56,13 @@ export class AuthController {
   @Get('refresh-token')
   @UseGuards(RefreshTokenGuard)
   refreshAccessToken(@Req() req: UserInRequest) {
-    return this.authService.refreshAccessToken(req.user.username);
+    return this.authService.refreshAccessToken(req.user.id);
   }
 
   @UseGuards(AccessTokenGuard)
   @Get('logout')
   logout(@Req() req: UserInRequest, @Res({ passthrough: true }) res: Response) {
     res.clearCookie(this.configService.get<string>('COOKIES_NAME'));
-    return this.authService.logout(req.user.username);
+    return this.authService.logout(req.user.id);
   }
 }

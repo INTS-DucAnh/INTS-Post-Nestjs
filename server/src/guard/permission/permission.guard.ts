@@ -10,9 +10,7 @@ export class PermissionGuard implements CanActivate {
     private readonly reflector: Reflector,
     private permissionService: PermissionService,
   ) {}
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredActions = this.reflector.get<ActionsDto[]>(
       'actions',
       context.getHandler(),
@@ -23,10 +21,13 @@ export class PermissionGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     // const userId = request.user.id;
+    const [isAdmin, isValidAction] = await Promise.all([
+      this.permissionService.isAdmin(request.user.id),
+      this.permissionService.validAction(request.user.id, requiredActions),
+    ]);
 
-    return this.permissionService.validAction(
-      request.user.roleid,
-      requiredActions,
-    );
+    request.user.isAdmin = isAdmin;
+
+    return isAdmin || isValidAction;
   }
 }
