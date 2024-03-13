@@ -13,11 +13,15 @@ export class UserServices {
     @InjectRepository(Users) private readonly userRepository: Repository<Users>,
   ) {}
 
-  async checkValidUser(data: FindUserDto | string | number) {
+  async checkValidUser(
+    data: FindUserDto | string | number,
+    deleted: boolean = false,
+  ) {
     let existUser: Users;
 
     if (typeof data === 'number') {
-      existUser = await this.findUserById(data);
+      if (deleted) existUser = await this.findDeletedUserById(data);
+      else existUser = await this.findUserById(data);
     } else if (typeof data === 'string') {
       const userId = parseInt(data) || 0;
       if (!userId) throw new BadRequestException('Invalid query!');
@@ -28,6 +32,14 @@ export class UserServices {
     if (!existUser) throw new BadRequestException('This use is not exist!');
 
     return existUser;
+  }
+
+  findDeletedUserById(id: number) {
+    return this.userRepository
+      .createQueryBuilder('users')
+      .withDeleted()
+      .where('users.id = :id', { id: id })
+      .getOne();
   }
 
   findUserById(id: number): Promise<Users> {
@@ -43,10 +55,10 @@ export class UserServices {
   }
 
   deleteUser(id: number) {
-    return this.userRepository.delete({ id: id });
+    return this.userRepository.softDelete({ id: id });
   }
 
-  createUser(createQuery: CreateUserDto, roleid: number) {
-    return this.userRepository.save({ roleid, ...createQuery });
+  createUser(createQuery: UserDto) {
+    return this.userRepository.save(createQuery);
   }
 }

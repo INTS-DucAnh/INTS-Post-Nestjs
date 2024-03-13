@@ -1,6 +1,7 @@
 import { Users } from 'src/entity/user.entity';
 import {
   Column,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToMany,
@@ -16,6 +17,12 @@ export class Categories {
 
   @Column('text', { nullable: false })
   title: string;
+
+  @Column('integer', { nullable: false })
+  updateby: number;
+
+  @Column('integer', { nullable: false })
+  createby: number;
 
   @ManyToOne(() => Users, (users: Users) => users.id)
   @JoinColumn({ name: 'updateby' })
@@ -42,4 +49,7 @@ export class Categories {
     onUpdate: 'RESTRICT',
   })
   posts: Posts[];
+
+  @DeleteDateColumn({ name: 'deletedat' })
+  deletedat: Date;
 }

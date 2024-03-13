@@ -63,7 +63,7 @@ export class PostController {
 
   @UseGuards(AccessTokenGuard)
   @UseInterceptors(FileInterceptor('images'))
-  @Post('/create')
+  @Post('/')
   async createUserPost(
     @Body() formPost: FormPostDto,
     @Req() req: UserInRequest,
@@ -131,7 +131,7 @@ export class PostController {
 
   @UseGuards(AccessTokenGuard)
   @UseInterceptors(FileInterceptor('images'))
-  @Put('/update')
+  @Put('/')
   async updateUsePost(
     @Body() updatePost: UpdatePostDto,
     @Req() req: UserInRequest,

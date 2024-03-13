@@ -39,6 +39,9 @@ export class PostImage {
   })
   updateat: Date;
 
+  @Column('integer', { nullable: false })
+  updateby: number;
+
   @ManyToOne(() => Users, (users: Users) => users.id)
   @JoinColumn({ name: 'updateby' })
   usersUpdate: Users[];

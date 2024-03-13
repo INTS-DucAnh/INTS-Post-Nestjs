@@ -1,4 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Roles } from './role.entity';
+import { Gender } from 'src/apps/auth/dto/auth-create.dto';
 
 @Entity('users')
 export class Users {
@@ -12,7 +21,7 @@ export class Users {
   lastname: string;
 
   @Column('text', { nullable: true })
-  gender: string;
+  gender: Gender;
 
   @Column('date', { nullable: true, default: '1990/01/01' })
   birthday: Date;
@@ -20,8 +29,12 @@ export class Users {
   @Column('text', { nullable: true })
   avatar: string;
 
-  @Column({ nullable: false })
+  @Column('integer', { nullable: false })
   roleid: number;
+
+  @ManyToOne(() => Roles, (roles: Roles) => roles.id)
+  @JoinColumn({ name: 'roleid' })
+  roles: Roles[];
 
   @Column('varchar', { nullable: false, unique: true })
   username: string;
@@ -31,4 +44,7 @@ export class Users {
 
   @Column('varchar', { nullable: false })
   password: string;
+
+  @DeleteDateColumn({ name: 'deletedat' })
+  deletedat: Date;
 }
