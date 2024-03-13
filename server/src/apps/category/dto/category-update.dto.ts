@@ -1,4 +1,11 @@
-export type UpdateCategoryDto = {
+import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+
+export class UpdateCategoryDto {
+  @IsNotEmpty()
+  @IsInt()
   id: number;
-  title?: string;
-};
+
+  @IsNotEmpty()
+  @IsString()
+  title: string;
+}

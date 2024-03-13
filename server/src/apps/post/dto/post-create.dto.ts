@@ -1,11 +1,28 @@
-export type FormPostDto = {
+import {
+  IsArray,
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+
+export class FormPostDto {
+  @IsNotEmpty()
+  @IsString()
   title: string;
+
+  @IsOptional()
+  @IsString()
   content: string;
-  updateat: Date;
-  updateby?: number;
-  createby?: number;
-  deleted: boolean;
-};
+
+  @IsNotEmpty({ message: 'Atleast 1 image should be provided!' })
+  @IsArray()
+  images: string[];
+
+  @IsNotEmpty({ message: 'Atleast 1 category should be provided!' })
+  @IsArray()
+  categories: number[];
+}
 
 export type CreatePostDto = {
   title: string;
@@ -13,5 +30,14 @@ export type CreatePostDto = {
   updateat: Date;
   updateby?: number;
   createby?: number;
-  deleted: boolean;
+  createat: Date;
 };
+
+export class PostImageUploadDto {
+  @IsNotEmpty()
+  @IsBoolean()
+  setdefault: boolean;
+
+  @IsNotEmpty()
+  image: Express.Multer.File;
+}

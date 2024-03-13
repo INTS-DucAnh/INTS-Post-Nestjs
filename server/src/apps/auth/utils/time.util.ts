@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class TimeUtil {
-  caltime(timeString: string) {
+  caltime(timeString: string): number {
     const [time, type] = timeString.split(' ');
     const parsedTime = parseInt(time);
 

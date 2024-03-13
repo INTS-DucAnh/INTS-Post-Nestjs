@@ -6,7 +6,7 @@ export type jwtPayload = {
   sub: string;
   username: string;
   id: number;
-  roleid: number;
+  isAdmin?: boolean;
 };
 
 @Injectable()
