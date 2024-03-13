@@ -2,6 +2,8 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { jwtPayload } from './accesstoken.strategies';
+import { Request } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -10,16 +12,25 @@ export class RefreshTokenStrategy extends PassportStrategy(
 ) {
   constructor() {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        RefreshTokenStrategy.extractJWTFromCookies,
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       secretOrKey: process.env.SECRET_REFRESH_TOKEN,
       passReqToCallback: true,
     });
   }
   validate(req: Request, payload: jwtPayload) {
-    const bearer: string = req.headers['authorization'];
-    if (!bearer) throw new ForbiddenException('Can not find refresh token');
+    const refreshToken: string =
+      RefreshTokenStrategy.extractJWTFromCookies(req);
+    if (!req) throw new ForbiddenException('Can not find refresh token');
 
-    const refreshToken = bearer.replace('Bearer', '').trim();
     return { ...payload, refreshToken };
+  }
+  static extractJWTFromCookies(req: Request): string | null {
+    if (req.cookies && req.cookies[process.env.COOKIES_NAME]) {
+      return req.cookies[process.env.COOKIES_NAME];
+    }
+    return null;
   }
 }

@@ -6,6 +6,7 @@ import { CreateUserDto } from './dto/auth-create.dto';
 import * as argon2 from 'argon2';
 import { AuthDto } from './dto/auth.dto';
 import { jwtPayload } from './strategies/accesstoken.strategies';
+import { RolesIdEnum } from 'src/guard/permission/roles.enum';
 
 @Injectable()
 export class AuthServices {
@@ -22,13 +23,14 @@ export class AuthServices {
     if (userExists) throw new BadRequestException('This user already exist!');
 
     const hashPass = await this.hashData(createUser.password);
-    const createAccount = await this.userService.createUser(
-      {
-        ...createUser,
-        password: hashPass,
-      },
-      roleid,
-    );
+    const createAccount = await this.userService.createUser({
+      ...createUser,
+      avatar: '',
+      password: hashPass,
+      online: false,
+      deletedat: null,
+      roleid: RolesIdEnum.EDITOR,
+    });
 
     const { password, ...props } = createAccount;
 
@@ -36,10 +38,9 @@ export class AuthServices {
   }
 
   async login(userLogin: AuthDto) {
-    const userExists = await this.userService.findUser({
+    const userExists = await this.userService.checkValidUser({
       username: userLogin.username,
     });
-    if (!userExists) throw new BadRequestException('This user is not exist!');
     const passwordMatch = await argon2.verify(
       userExists.password,
       userLogin.password,
@@ -51,24 +52,22 @@ export class AuthServices {
         {
           id: userExists.id,
           username: userExists.username,
-          roleid: userExists.roleid,
           sub: userExists.id.toString(),
         },
         this.configService.get<string>('SECRET_ACCESS_TOKEN'),
         {
-          expiresIn: '15m',
+          expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRE'),
         },
       ),
       refreshToken: await this.genAToken(
         {
           id: userExists.id,
           username: userExists.username,
-          roleid: userExists.roleid,
           sub: userExists.id.toString(),
         },
         this.configService.get<string>('SECRET_REFRESH_TOKEN'),
         {
-          expiresIn: '7d',
+          expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRE'),
         },
       ),
     };
@@ -79,31 +78,27 @@ export class AuthServices {
     return token;
   }
 
-  async logout(username: string) {
-    const userExists = await this.userService.findUser({
-      username: username,
-    });
+  async logout(userid: number) {
+    const userExists = await this.userService.checkValidUser(userid);
+
     return this.userService.updateUser({
       ...userExists,
       online: false,
     });
   }
 
-  async refreshAccessToken(username: string) {
-    const userExists = await this.userService.findUser({
-      username: username,
-    });
+  async refreshAccessToken(userid: number) {
+    const userExists = await this.userService.checkValidUser(userid);
     if (!userExists) throw new BadRequestException('This user is not exist!');
     return await this.genAToken(
       {
         id: userExists.id,
         username: userExists.username,
-        roleid: userExists.roleid,
         sub: userExists.id.toString(),
       },
       this.configService.get<string>('SECRET_ACCESS_TOKEN'),
       {
-        expiresIn: '15m',
+        expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRE'),
       },
     );
   }

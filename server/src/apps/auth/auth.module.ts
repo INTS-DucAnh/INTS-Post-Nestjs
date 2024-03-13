@@ -6,6 +6,7 @@ import { RefreshTokenStrategy } from './strategies/refreshtoken.strategies';
 import { UserModule } from '../user/user.module';
 import { JwtService } from '@nestjs/jwt';
 import { PermissionModule } from '../permission/permission.module';
+import { TimeUtil } from './utils/time.util';
 
 @Module({
   imports: [UserModule, PermissionModule],
@@ -15,6 +16,8 @@ import { PermissionModule } from '../permission/permission.module';
     AuthServices,
     AccessTokenStrategy,
     RefreshTokenStrategy,
+    TimeUtil,
   ],
+  exports: [TimeUtil],
 })
 export class AuthModule {}
