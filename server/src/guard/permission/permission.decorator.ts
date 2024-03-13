@@ -1,4 +1,4 @@
 import { Reflector } from '@nestjs/core';
+import { ActionsDto } from './actions.dto';
 
-export const Actions =
-  Reflector.createDecorator<Array<{ target: string; action: string[] }>>();
+export const Actions = Reflector.createDecorator<ActionsDto[]>();

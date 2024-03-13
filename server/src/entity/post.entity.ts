@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Users } from './user.entity';
-import { Categoryies } from './category.entity';
+import { Categories } from './category.entity';
 
 @Entity('posts')
 export class Posts {
@@ -19,13 +19,17 @@ export class Posts {
   title: string;
 
   @Column('jsonb', { nullable: false })
-  content: Object;
+  content: string;
 
   @ManyToOne(() => Users, (users: Users) => users.id)
   @JoinColumn({ name: 'updateby' })
-  users: Users[];
+  usersUpdate: Users[];
 
-  @ManyToMany(() => Categoryies, (categories: Categoryies) => categories.posts)
+  @ManyToOne(() => Users, (users: Users) => users.id)
+  @JoinColumn({ name: 'createby' })
+  usersCreate: Users[];
+
+  @ManyToMany(() => Categories, (categories: Categories) => categories.posts)
   @JoinTable({
     name: 'post-category',
     joinColumn: {
@@ -37,8 +41,20 @@ export class Posts {
       referencedColumnName: 'id',
     },
   })
-  categories?: Categoryies[];
+  categories?: Categories[];
 
-  @Column('timestamp without time zone')
+  @Column('timestamp without time zone', {
+    nullable: false,
+    default: new Date(),
+  })
   updateat: Date;
+
+  @Column('timestamp without time zone', {
+    nullable: false,
+    default: new Date(),
+  })
+  createat: Date;
+
+  @Column('boolean', { nullable: false })
+  deleted: boolean;
 }

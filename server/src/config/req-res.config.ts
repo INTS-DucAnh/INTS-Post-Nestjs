@@ -2,7 +2,6 @@ import { jwtPayload } from 'src/apps/auth/strategies/accesstoken.strategies';
 
 type jsonRes = {
   success: boolean;
-  status: number;
   body: Object;
   message: string;
 };

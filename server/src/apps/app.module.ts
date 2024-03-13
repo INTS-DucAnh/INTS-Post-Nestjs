@@ -6,14 +6,18 @@ import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { PermissionModule } from './permission/permission.module';
+import { PostModule } from './post/post.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
     AuthModule,
-    UserModule,
     PermissionModule,
+    UserModule,
+    PostModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,3 @@
-import { Post } from '@nestjs/common';
 import { Users } from 'src/entity/user.entity';
 import {
   Column,
@@ -11,7 +10,7 @@ import {
 import { Posts } from './post.entity';
 
 @Entity('categories')
-export class Categoryies {
+export class Categories {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -19,12 +18,28 @@ export class Categoryies {
   title: string;
 
   @ManyToOne(() => Users, (users: Users) => users.id)
-  @JoinColumn({ name: 'updateny' })
-  users: Users[];
+  @JoinColumn({ name: 'updateby' })
+  usersUpdate: Users[];
 
-  @Column('timestamp without time zone', { nullable: false })
+  @ManyToOne(() => Users, (users: Users) => users.id)
+  @JoinColumn({ name: 'createby' })
+  usersCreate: Users[];
+
+  @Column('timestamp without time zone', {
+    nullable: false,
+    default: new Date(),
+  })
   updateat: Date;
 
-  @ManyToMany(() => Posts, (posts: Posts) => posts.categories)
+  @Column('timestamp without time zone', {
+    nullable: false,
+    default: new Date(),
+  })
+  createat: Date;
+
+  @ManyToMany(() => Posts, (posts: Posts) => posts.categories, {
+    onDelete: 'CASCADE',
+    onUpdate: 'RESTRICT',
+  })
   posts: Posts[];
 }

@@ -36,10 +36,9 @@ export class AuthServices {
   }
 
   async login(userLogin: AuthDto) {
-    const userExists = await this.userService.findUser({
+    const userExists = await this.userService.checkValidUser({
       username: userLogin.username,
     });
-    if (!userExists) throw new BadRequestException('This user is not exist!');
     const passwordMatch = await argon2.verify(
       userExists.password,
       userLogin.password,
@@ -56,7 +55,7 @@ export class AuthServices {
         },
         this.configService.get<string>('SECRET_ACCESS_TOKEN'),
         {
-          expiresIn: '15m',
+          expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRE'),
         },
       ),
       refreshToken: await this.genAToken(
@@ -68,7 +67,7 @@ export class AuthServices {
         },
         this.configService.get<string>('SECRET_REFRESH_TOKEN'),
         {
-          expiresIn: '7d',
+          expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRE'),
         },
       ),
     };
@@ -103,7 +102,7 @@ export class AuthServices {
       },
       this.configService.get<string>('SECRET_ACCESS_TOKEN'),
       {
-        expiresIn: '15m',
+        expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRE'),
       },
     );
   }
