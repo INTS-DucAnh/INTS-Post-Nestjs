@@ -4,49 +4,35 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Posts } from './post.entity';
+import { ModifyEntity } from './modify.entity';
 
 @Entity('categories')
-export class Categories {
+export class Categories extends ModifyEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column('text', { nullable: false })
   title: string;
 
-  @Column('integer', { nullable: false })
-  updateby: number;
-
-  @Column('integer', { nullable: false })
-  createby: number;
-
-  @ManyToOne(() => Users, (users: Users) => users.id)
-  @JoinColumn({ name: 'updateby' })
-  usersUpdate: Users[];
-
-  @ManyToOne(() => Users, (users: Users) => users.id)
-  @JoinColumn({ name: 'createby' })
-  usersCreate: Users[];
-
-  @Column('timestamp without time zone', {
-    nullable: false,
-    default: new Date(),
-  })
-  updateat: Date;
-
-  @Column('timestamp without time zone', {
-    nullable: false,
-    default: new Date(),
-  })
-  createat: Date;
-
   @ManyToMany(() => Posts, (posts: Posts) => posts.categories, {
     onDelete: 'CASCADE',
     onUpdate: 'RESTRICT',
+  })
+  @JoinTable({
+    name: 'post-category',
+    joinColumn: {
+      name: 'cid',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'poid',
+    },
   })
   posts: Posts[];
 

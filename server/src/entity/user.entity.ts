@@ -4,10 +4,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Roles } from './role.entity';
 import { Gender } from 'src/apps/auth/dto/auth-create.dto';
+import { Categories } from './category.entity';
+import { PostCategory } from './post-category.entity';
 
 @Entity('users')
 export class Users {
@@ -47,4 +50,22 @@ export class Users {
 
   @DeleteDateColumn({ name: 'deletedat' })
   deletedat: Date;
+
+  @OneToMany(
+    () => Categories,
+    (categories: Categories) => categories.usersCreate,
+  )
+  createCategories: Categories[];
+
+  @OneToMany(
+    () => Categories,
+    (categories: Categories) => categories.usersUpdate,
+  )
+  updateCategories: Categories[];
+
+  @OneToMany(
+    () => PostCategory,
+    (postCategory: PostCategory) => postCategory.users,
+  )
+  updatePostCategory: PostCategory[];
 }

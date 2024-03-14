@@ -1,4 +1,5 @@
 import {
+  ChildEntity,
   Column,
   DeleteDateColumn,
   Entity,
@@ -6,35 +7,26 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Users } from './user.entity';
 import { Categories } from './category.entity';
+import { ModifyEntity } from './modify.entity';
 
 @Entity('posts')
-export class Posts {
+export class Posts extends ModifyEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column('text', { nullable: false })
   title: string;
 
-  @Column('jsonb', { nullable: false })
+  @Column('text', { nullable: false })
   content: string;
 
-  @Column('integer', { nullable: false })
-  updateby: number;
-
-  @Column('integer', { nullable: false })
-  createby: number;
-
-  @ManyToOne(() => Users, (users: Users) => users.id)
-  @JoinColumn({ name: 'updateby' })
-  usersUpdate: Users[];
-
-  @ManyToOne(() => Users, (users: Users) => users.id)
-  @JoinColumn({ name: 'createby' })
-  usersCreate: Users[];
+  @Column('text', { nullable: false })
+  thumbnail: string;
 
   @ManyToMany(() => Categories, (categories: Categories) => categories.posts)
   @JoinTable({
@@ -45,22 +37,9 @@ export class Posts {
     },
     inverseJoinColumn: {
       name: 'cid',
-      referencedColumnName: 'id',
     },
   })
   categories?: Categories[];
-
-  @Column('timestamp without time zone', {
-    nullable: false,
-    default: new Date(),
-  })
-  updateat: Date;
-
-  @Column('timestamp without time zone', {
-    nullable: false,
-    default: new Date(),
-  })
-  createat: Date;
 
   @DeleteDateColumn({ name: 'deletedat' })
   deletedat: Date;
