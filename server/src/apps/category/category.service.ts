@@ -38,7 +38,7 @@ export class CategoryService {
     return this.categoryRepository.softDelete({ id: id });
   }
 
-  findCategory(skip: number, limit: number = 10) {
+  findCategory(skip: number = 0, limit: number = 10) {
     return this.categoryRepository
       .createQueryBuilder('categories')
       .skip(skip)

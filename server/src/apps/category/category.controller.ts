@@ -30,8 +30,9 @@ export class CategoryController {
     private readonly permissionService: PermissionService,
   ) {}
 
+  @UseGuards(AccessTokenGuard)
   @Get('/')
-  getCategory(@Query('skip') skip: number, @Query('limit') limit: number = 10) {
+  getCategory(@Query('skip') skip: number, @Query('limit') limit: number) {
     return this.categoryService.findCategory(skip, limit);
   }
 
