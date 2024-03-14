@@ -3,10 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from 'src/entity/user.entity';
 import { UserServices } from './user.service';
 import { UserController } from './user.controller';
-import { PostImageModule } from '../post-image/post-image.module';
+import { PermissionModule } from '../permission/permission.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Users]), PostImageModule],
+  imports: [TypeOrmModule.forFeature([Users]), PermissionModule],
   controllers: [UserController],
   providers: [UserServices],
   exports: [UserServices],

@@ -28,7 +28,6 @@ export class UserServices {
 
       existUser = await this.findUserById(userId);
     } else existUser = await this.findUser(data);
-
     if (!existUser) throw new BadRequestException('This use is not exist!');
 
     return existUser;

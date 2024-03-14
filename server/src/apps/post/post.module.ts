@@ -5,16 +5,13 @@ import { PostService } from './post.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Posts } from 'src/entity/post.entity';
 import { PermissionModule } from '../permission/permission.module';
-import { PostCategoryModule } from '../post-category/post-category.module';
-import { PostImageModule } from '../post-image/post-image.module';
+import { PostCategory } from 'src/entity/post-category.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Posts]),
+    TypeOrmModule.forFeature([Posts, PostCategory]),
     UserModule,
     PermissionModule,
-    PostCategoryModule,
-    PostImageModule,
   ],
   controllers: [PostController],
   providers: [PostService],
