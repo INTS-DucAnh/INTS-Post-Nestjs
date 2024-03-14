@@ -1,10 +1,14 @@
+import { Gender } from 'src/apps/auth/dto/auth-create.dto';
+
 export type UserDto = {
-  id: number;
+  id?: number;
   birthday: Date;
   password: string;
-  gender: string;
+  gender: Gender;
+  roleid: number;
   firstname: string;
   lastname: string;
   avatar: string;
   online: boolean;
+  deletedat: Date;
 };

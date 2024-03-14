@@ -11,6 +11,8 @@ export class FileUtils {
         return parsedSized * FileUtils.CalSizeFile('1024 mb');
       case 'mb':
         return parsedSized * FileUtils.CalSizeFile('1024 kb');
+      case 'kb':
+        return parsedSized * FileUtils.CalSizeFile('1024 b');
       default:
         return parsedSized;
     }

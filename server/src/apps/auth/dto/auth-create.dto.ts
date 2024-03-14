@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, IsStrongPassword } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsStrongPassword,
+  Validate,
+} from 'class-validator';
+import { UserGenderValidator } from 'src/apps/user/validator/user-gender.validator';
 
 export enum Gender {
   MALE = 'M',
@@ -15,7 +21,7 @@ export class CreateUserDto {
   password: string;
 
   @IsNotEmpty()
-  @IsString()
+  @Validate(UserGenderValidator)
   gender: Gender;
 
   @IsNotEmpty()

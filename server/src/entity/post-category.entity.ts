@@ -9,6 +9,9 @@ export class PostCategory {
   @PrimaryColumn()
   cid: number;
 
+  @Column('integer', { nullable: false })
+  updateby: number;
+
   @ManyToOne(() => Users, (users: Users) => users.id)
   @JoinColumn({ name: 'updateby' })
   users: Users[];

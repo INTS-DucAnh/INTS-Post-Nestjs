@@ -1,5 +1,6 @@
 import {
   Column,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   JoinTable,
@@ -20,6 +21,12 @@ export class Posts {
 
   @Column('jsonb', { nullable: false })
   content: string;
+
+  @Column('integer', { nullable: false })
+  updateby: number;
+
+  @Column('integer', { nullable: false })
+  createby: number;
 
   @ManyToOne(() => Users, (users: Users) => users.id)
   @JoinColumn({ name: 'updateby' })
@@ -55,6 +62,6 @@ export class Posts {
   })
   createat: Date;
 
-  @Column('boolean', { nullable: false })
-  deleted: boolean;
+  @DeleteDateColumn({ name: 'deletedat' })
+  deletedat: Date;
 }
