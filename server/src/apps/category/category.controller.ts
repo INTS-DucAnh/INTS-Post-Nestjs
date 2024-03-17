@@ -20,6 +20,9 @@ import { UserServices } from '../user/user.service';
 import { PermissionService } from '../permission/permission.service';
 import { ResponseInterceptor } from 'src/interceptor/response.interceptor';
 import { AccessTokenGuard } from 'src/guard/jwt/accesstoken.guard';
+import { Roles } from 'src/guard/permission/permission.decorator';
+import { RoleTitleEnum } from '../permission/enum/permisison.enum';
+import { PermissionGuard } from 'src/guard/permission/permission.guard';
 
 @UseInterceptors(new ResponseInterceptor())
 @Controller('/category')
@@ -29,13 +32,16 @@ export class CategoryController {
     private readonly userService: UserServices,
     private readonly permissionService: PermissionService,
   ) {}
-
+  @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
   @UseGuards(AccessTokenGuard)
   @Get('/')
   getCategory(@Query('skip') skip: number, @Query('limit') limit: number) {
     return this.categoryService.findCategory(skip, limit);
   }
 
+  @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
   @UseGuards(AccessTokenGuard)
   @Put('/')
   async updateCategory(
@@ -58,6 +64,8 @@ export class CategoryController {
       throw new ForbiddenException("You don't have permission to do this!");
   }
 
+  @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
   @UseGuards(AccessTokenGuard)
   @Post('/')
   async createCategory(
@@ -77,14 +85,10 @@ export class CategoryController {
     });
   }
 
-  @UseGuards(AccessTokenGuard)
+  @Roles([RoleTitleEnum.ADMIN])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
   @Delete('/:id')
   async deleteCategory(@Param('id') cid: number, @Req() req: UserInRequest) {
-    const validCate = await this.categoryService.isValidCategory(cid);
-
-    if (validCate.createby === req.user.id || req.user.isAdmin) {
-      return this.categoryService.deleteCategory(cid);
-    } else
-      throw new ForbiddenException("You don't have permission to do this!");
+    return this.categoryService.deleteCategory(cid);
   }
 }

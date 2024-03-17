@@ -6,7 +6,6 @@ import {
   Post,
   Req,
   Res,
-  Session,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -48,6 +47,7 @@ export class AuthController {
       ),
       httpOnly: true,
       secure: true,
+      sameSite: 'none',
     });
 
     return accessToken;

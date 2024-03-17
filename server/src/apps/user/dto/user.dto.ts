@@ -9,6 +9,5 @@ export type UserDto = {
   firstname: string;
   lastname: string;
   avatar: string;
-  online: boolean;
   deletedat: Date;
 };

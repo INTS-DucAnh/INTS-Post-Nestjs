@@ -26,10 +26,6 @@ export class PostService {
     private readonly configService: ConfigService,
   ) {}
 
-  async getPostCategoryById(pid: number) {
-    return this.postCategoryRepository.findBy({ poid: pid });
-  }
-
   async attachCategoryToPosts(cid: number[], postid: number, userid: number) {
     const deleteCategory = await this.postCategoryRepository.query(
       `DELETE FROM "post-category" WHERE "poid" = $1`,
