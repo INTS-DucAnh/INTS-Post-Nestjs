@@ -9,13 +9,13 @@ export class PostCategory {
   @PrimaryColumn()
   cid: number;
 
-  @Column('integer', { nullable: false })
-  updateby: number;
+  // @Column('integer', { nullable: true })
+  // updateby: number;
 
-  @ManyToOne(() => Users, (users: Users) => users.id)
-  @JoinColumn({ name: 'updateby' })
-  users: Users[];
+  // @ManyToOne(() => Users, (users: Users) => users.id)
+  // @JoinColumn({ name: 'updateby' })
+  // users: Users[];
 
-  @Column('timestamp without time zone', { nullable: false })
-  updateat: Date;
+  // @Column('timestamp without time zone', { nullable: true })
+  // updateat: Date;
 }
