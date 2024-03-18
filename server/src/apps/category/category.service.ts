@@ -38,11 +38,32 @@ export class CategoryService {
     return this.categoryRepository.softDelete({ id: id });
   }
 
-  findCategory(skip: number = 0, limit: number = 10) {
-    return this.categoryRepository
+  async findCategory(skip: number = 0, limit: number = 10) {
+    const query = this.categoryRepository
       .createQueryBuilder('categories')
-      .skip(skip)
-      .limit(limit)
-      .getMany();
+      .innerJoinAndSelect('categories.usersUpdate', 'users1')
+      .innerJoinAndSelect('categories.usersCreate', 'users2')
+      .select([
+        'categories.id',
+        'categories.title',
+        'categories.createat',
+        'categories.updateat',
+        'users1.username',
+        'users1.avatar',
+        'users1.firstname',
+        'users1.lastname',
+        'users2.username',
+        'users2.avatar',
+        'users2.firstname',
+        'users2.lastname',
+      ]);
+    return {
+      categories: await query
+        .orderBy('categories.id', 'ASC')
+        .limit(limit)
+        .skip(skip)
+        .getMany(),
+      count: await query.getCount(),
+    };
   }
 }

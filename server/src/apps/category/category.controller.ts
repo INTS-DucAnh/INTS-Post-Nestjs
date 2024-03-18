@@ -20,6 +20,9 @@ import { UserServices } from '../user/user.service';
 import { PermissionService } from '../permission/permission.service';
 import { ResponseInterceptor } from 'src/interceptor/response.interceptor';
 import { AccessTokenGuard } from 'src/guard/jwt/accesstoken.guard';
+import { RoleTitleEnum } from '../permission/enum/permisison.enum';
+import { PermissionGuard } from 'src/guard/permission/permission.guard';
+import { Roles } from 'src/guard/permission/permission.decorator';
 
 @UseInterceptors(new ResponseInterceptor())
 @Controller('/category')
@@ -30,13 +33,22 @@ export class CategoryController {
     private readonly permissionService: PermissionService,
   ) {}
 
-  @UseGuards(AccessTokenGuard)
+  @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
   @Get('/')
   getCategory(@Query('skip') skip: number, @Query('limit') limit: number) {
     return this.categoryService.findCategory(skip, limit);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
+  @Get('/:id')
+  getCategoryInfo(@Param('id') id: number) {
+    return this.categoryService.findById(id);
+  }
+
+  @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
   @Put('/')
   async updateCategory(
     @Body() updateCategory: UpdateCategoryDto,
@@ -58,7 +70,8 @@ export class CategoryController {
       throw new ForbiddenException("You don't have permission to do this!");
   }
 
-  @UseGuards(AccessTokenGuard)
+  @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
   @Post('/')
   async createCategory(
     @Body() createCategory: FormCreateCategoryDto,
