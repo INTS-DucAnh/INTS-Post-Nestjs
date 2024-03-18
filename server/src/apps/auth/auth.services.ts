@@ -27,7 +27,6 @@ export class AuthServices {
       ...createUser,
       avatar: '',
       password: hashPass,
-      online: false,
       deletedat: null,
       roleid: RolesIdEnum.EDITOR,
     });
@@ -71,10 +70,6 @@ export class AuthServices {
         },
       ),
     };
-    const updateLogin = await this.userService.updateUser({
-      ...userExists,
-      online: true,
-    });
     return token;
   }
 
@@ -83,7 +78,6 @@ export class AuthServices {
 
     return this.userService.updateUser({
       ...userExists,
-      online: false,
     });
   }
 

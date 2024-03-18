@@ -17,7 +17,6 @@ export class S3Utils {
     });
     try {
       const results = await Promise.all(uploadPromises);
-
       return results;
     } catch (error) {
       throw error;
@@ -27,7 +26,7 @@ export class S3Utils {
   static async deleteImageFromS3(filenames: string[], bucketName: string) {
     const s3 = new S3();
     const deleteImage = filenames.map((file: string) => {
-      let params: S3.DeleteObjectRequest = {
+      let params = {
         Bucket: bucketName,
         Key: file,
       };
@@ -36,7 +35,6 @@ export class S3Utils {
 
     try {
       const results = await Promise.all(deleteImage);
-
       return results;
     } catch (error) {
       throw error;
