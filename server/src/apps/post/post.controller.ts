@@ -98,7 +98,7 @@ export class PostController {
     image: Express.Multer.File,
   ) {
     return this.postService.uploadImage({
-      filename: '',
+      filename: image.originalname,
       image: image,
     });
   }

@@ -119,10 +119,10 @@ export class UserController {
   @Put('/pass')
   async changePasswordUser(
     @Body() changePassword: ChangPasswordDto,
-    @Query('id') id: string,
+    @Query('id') id: number,
     @Req() req: UserInRequest,
   ) {
-    if (req.user.id !== parseInt(id))
+    if (req.user.id !== id)
       throw new BadRequestException("You don't own this account");
     const existUsers = await this.userService.checkValidUser(id);
 
@@ -147,6 +147,23 @@ export class UserController {
 
   @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
   @UseGuards(AccessTokenGuard, PermissionGuard)
+  @Get('/find')
+  async findUser(@Query('skip') skip: number, @Query('limit') limit: number) {
+    return this.userService.findUserByFilter(skip, limit);
+  }
+
+  @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
+  @Get('/')
+  async getMyProfile(@Req()req: UserInRequest) {
+    const existUser = await this.userService.checkValidUser(req.user.id);
+
+    const { password, username, ...props } = existUser;
+    return props;
+  }
+  
+  @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
   @Get('/:id')
   async getUserProfile(@Param('id') id: number) {
     const existUser = await this.userService.checkValidUser(id);
@@ -159,9 +176,8 @@ export class UserController {
   @UseGuards(AccessTokenGuard, PermissionGuard)
   @Delete('/:id')
   async deleteUser(@Param('id') id: number, @Req() req: UserInRequest) {
-    if (req.user.id !== id)
-      throw new BadRequestException("You don't own this account!");
-
+    if (req.user.id === id)
+      throw new BadRequestException('Can not delete Admin account!');
     const existUser = await this.userService.checkValidUser(id);
 
     const deleteUser = await this.userService.deleteUser(id);
