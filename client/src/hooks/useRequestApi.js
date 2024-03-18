@@ -11,12 +11,23 @@ export default function useRequestApi() {
   const { showToast } = useContext(ToastContext);
   const { setToken, getToken } = UseToken();
 
-  const RequestApi = async ({ method, path, data = {}, ...props }) => {
+  const RequestApi = async ({
+    method,
+    path,
+    data = {},
+    accessToken = false,
+    ...props
+  }) => {
     try {
+      const { headers, ...options } = props;
       const requestRes = await fetch(`${config.host}/${path}`, {
         method: method,
         ...(method !== "GET" ? { body: JSON.stringify(data) } : {}),
         credentials: "include",
+        headers: {
+          ...headers,
+          ...(accessToken ? { Authorization: `Bearer ${getToken()}` } : {}),
+        },
         ...props,
       });
       const json = await requestRes.json();
@@ -24,7 +35,6 @@ export default function useRequestApi() {
         return json;
       } else if (requestRes.status === 401 && json.message === "Unauthorized") {
         const getRefreshToken = await RequestAccessToken();
-        const { headers, ...data } = props;
         return await RequestApi({
           method,
           path,
@@ -33,13 +43,17 @@ export default function useRequestApi() {
             ...headers,
             Authorization: `Bearer ${getRefreshToken}`,
           },
-          ...data,
+          ...options,
         });
       } else
         showToast(
           "error",
           "Error",
-          typeof json.message === "object" ? json.message[0] : json.message
+          requestRes.status === 403
+            ? "You need Permission!"
+            : typeof json.message === "object"
+            ? json.message[0]
+            : json.message
         );
       return false;
     } catch (err) {
