@@ -14,4 +14,10 @@ export const SectionHeader = styled.section`
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  & > button {
+    font-size: 0.9rem;
+  }
 `;

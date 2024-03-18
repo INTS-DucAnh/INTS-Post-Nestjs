@@ -9,7 +9,7 @@ export default function NavPane() {
   const [selected, SetSelected] = useState(0);
   const search = useLocation();
   const routeList = [
-    { name: "Dashboard", link: "/", icon: "pi-home" },
+    { name: "User", link: "/", icon: "pi-user" },
     { name: "Post", link: "/posts", icon: "pi-file-edit" },
     { name: "Category", link: "/categories", icon: "pi-filter" },
   ];
