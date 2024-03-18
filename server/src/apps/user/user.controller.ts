@@ -78,44 +78,6 @@ export class UserController {
 
   @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
   @UseGuards(AccessTokenGuard, PermissionGuard)
-  @Put('/:id')
-  async updateUserProfile(
-    @Body() updateProfile: UpdateUserDto,
-    @Param('id') id: number,
-    @Req() req: UserInRequest,
-  ) {
-    if (req.user.id !== id)
-      throw new BadRequestException("You don't own this account");
-    const existUsers = await this.userService.checkValidUser(id);
-
-    const updateUser = await this.userService.updateUser({
-      ...existUsers,
-      ...updateProfile,
-    });
-
-    const { password, ...props } = updateUser;
-    return props;
-  }
-
-  @Roles([RoleTitleEnum.ADMIN])
-  @UseGuards(AccessTokenGuard, PermissionGuard)
-  @Put('/restore/:id')
-  async restoreUser(@Param('id') id: number, @Req() req: UserInRequest) {
-    if (!req.user.isAdmin)
-      throw new BadRequestException("You don't own this account");
-    const existUsers = await this.userService.checkValidUser(id, true);
-
-    const updateUser = await this.userService.updateUser({
-      ...existUsers,
-      deletedat: null,
-    });
-
-    const { password, ...props } = updateUser;
-    return props;
-  }
-
-  @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
-  @UseGuards(AccessTokenGuard, PermissionGuard)
   @Put('/pass')
   async changePasswordUser(
     @Body() changePassword: ChangPasswordDto,
@@ -147,6 +109,44 @@ export class UserController {
 
   @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
   @UseGuards(AccessTokenGuard, PermissionGuard)
+  @Put('/:id')
+  async updateUserProfile(
+    @Body() updateProfile: UpdateUserDto,
+    @Param('id') id: number,
+    @Req() req: UserInRequest,
+  ) {
+    if (req.user.id !== id && !req.user.isAdmin)
+      throw new BadRequestException("You don't own this account");
+    const existUsers = await this.userService.checkValidUser(id);
+
+    const updateUser = await this.userService.updateUser({
+      ...existUsers,
+      ...updateProfile,
+    });
+
+    const { password, ...props } = updateUser;
+    return props;
+  }
+
+  @Roles([RoleTitleEnum.ADMIN])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
+  @Put('/restore/:id')
+  async restoreUser(@Param('id') id: number, @Req() req: UserInRequest) {
+    if (!req.user.isAdmin)
+      throw new BadRequestException("You don't own this account");
+    const existUsers = await this.userService.checkValidUser(id, true);
+
+    const updateUser = await this.userService.updateUser({
+      ...existUsers,
+      deletedat: null,
+    });
+
+    const { password, ...props } = updateUser;
+    return props;
+  }
+
+  @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
   @Get('/find')
   async findUser(@Query('skip') skip: number, @Query('limit') limit: number) {
     return this.userService.findUserByFilter(skip, limit);
@@ -155,13 +155,13 @@ export class UserController {
   @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
   @UseGuards(AccessTokenGuard, PermissionGuard)
   @Get('/')
-  async getMyProfile(@Req()req: UserInRequest) {
+  async getMyProfile(@Req() req: UserInRequest) {
     const existUser = await this.userService.checkValidUser(req.user.id);
 
     const { password, username, ...props } = existUser;
     return props;
   }
-  
+
   @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
   @UseGuards(AccessTokenGuard, PermissionGuard)
   @Get('/:id')
