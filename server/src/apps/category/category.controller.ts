@@ -32,9 +32,9 @@ export class CategoryController {
     private readonly userService: UserServices,
     private readonly permissionService: PermissionService,
   ) {}
+
   @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
   @UseGuards(AccessTokenGuard, PermissionGuard)
-  @UseGuards(AccessTokenGuard)
   @Get('/')
   getCategory(@Query('skip') skip: number, @Query('limit') limit: number) {
     return this.categoryService.findCategory(skip, limit);
@@ -42,7 +42,13 @@ export class CategoryController {
 
   @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
   @UseGuards(AccessTokenGuard, PermissionGuard)
-  @UseGuards(AccessTokenGuard)
+  @Get('/:id')
+  getCategoryInfo(@Param('id') id: number) {
+    return this.categoryService.findById(id);
+  }
+
+  @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
   @Put('/')
   async updateCategory(
     @Body() updateCategory: UpdateCategoryDto,
@@ -66,7 +72,6 @@ export class CategoryController {
 
   @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
   @UseGuards(AccessTokenGuard, PermissionGuard)
-  @UseGuards(AccessTokenGuard)
   @Post('/')
   async createCategory(
     @Body() createCategory: FormCreateCategoryDto,

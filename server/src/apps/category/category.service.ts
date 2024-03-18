@@ -58,7 +58,11 @@ export class CategoryService {
         'users2.lastname',
       ]);
     return {
-      categories: await query.limit(limit).skip(skip).getMany(),
+      categories: await query
+        .orderBy('categories.id', 'ASC')
+        .limit(limit)
+        .skip(skip)
+        .getMany(),
       count: await query.getCount(),
     };
   }
