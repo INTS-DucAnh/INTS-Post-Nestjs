@@ -1,4 +1,4 @@
 import { Reflector } from '@nestjs/core';
-import { ActionsDto } from './actions.dto';
+import { RoleTitleEnum } from 'src/apps/permission/enum/permisison.enum';
 
-export const Actions = Reflector.createDecorator<ActionsDto[]>();
+export const Roles = Reflector.createDecorator<RoleTitleEnum[]>();

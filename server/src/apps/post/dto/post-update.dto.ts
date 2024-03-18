@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUrl,
 } from 'class-validator';
 
 export class UpdatePostDto {
@@ -16,16 +17,16 @@ export class UpdatePostDto {
   title?: string;
 
   @IsOptional()
+  @IsUrl()
+  thumbnail?: string;
+
+  @IsOptional()
   @IsString()
   content?: string;
 
   @IsNotEmpty()
   @IsArray()
   categories: number[];
-
-  @IsNotEmpty()
-  @IsArray()
-  images: string[];
 }
 export type UpdateFormPostDto = {
   id: number;
