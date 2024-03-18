@@ -43,9 +43,6 @@ export class Users {
   @Column('varchar', { nullable: false, unique: true })
   username: string;
 
-  @Column('boolean', { nullable: false, default: false })
-  online: boolean;
-
   @Column('varchar', { nullable: false })
   password: string;
 

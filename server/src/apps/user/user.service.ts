@@ -49,6 +49,25 @@ export class UserServices {
     return this.userRepository.findOneBy({ username: findQuery.username });
   }
 
+  async findUserByFilter(skip: number, limit: number) {
+    const users = this.userRepository
+      .createQueryBuilder('users')
+      .innerJoinAndSelect('users.roles', 'roles')
+      .select([
+        'users.username',
+        'users.firstname',
+        'users.lastname',
+        'users.id',
+        'users.gender',
+        'users.avatar',
+        'roles.title',
+      ]);
+    return {
+      users: await users.limit(limit).skip(skip).getMany(),
+      max: await users.getCount(),
+    };
+  }
+
   updateUser(updateQuery: UserDto) {
     return this.userRepository.save(updateQuery);
   }
