@@ -36,8 +36,6 @@ export class PostService {
     const posts: PostCategoryDto[] = cid.map((id: number) => ({
       poid: postid,
       cid: id,
-      updateby: userid,
-      updateat: updateDate,
     }));
     return await this.updateCategoryPost(posts);
   }
@@ -65,7 +63,28 @@ export class PostService {
   }
 
   async findPost(skip: number, limit: number) {
-    const query = this.postRepository.createQueryBuilder('posts');
+    const query = this.postRepository
+      .createQueryBuilder('posts')
+      .innerJoinAndSelect('posts.usersUpdate', 'userUpdate')
+      .innerJoinAndSelect('posts.usersCreate', 'userCreate')
+      .leftJoinAndSelect('posts.categories', 'categories')
+      .select([
+        'posts.id',
+        'posts.content',
+        'posts.thumbnail',
+        'posts.createat',
+        'posts.updateat',
+        'categories.id',
+        'categories.title',
+        'userCreate.avatar',
+        'userCreate.firstname',
+        'userCreate.lastname',
+        'userCreate.username',
+        'userUpdate.avatar',
+        'userUpdate.firstname',
+        'userUpdate.lastname',
+        'userUpdate.username',
+      ]);
 
     const [maxPage, findRes] = await Promise.all([
       query.getCount(),
@@ -73,7 +92,7 @@ export class PostService {
     ]);
     return {
       posts: findRes,
-      max: Math.ceil(maxPage / 10),
+      max: maxPage,
     };
   }
 
