@@ -7,6 +7,10 @@ import DashboardRoute from "./private/dashboard";
 import CategoryRoute from "./private/categories";
 import BreadcrumbProvider from "../context/breadcromb.context";
 import { Outlet } from "react-router-dom";
+import CategoryDialogProvider from "../context/category-dialog.context";
+import PostRoute from "./private/posts";
+import PostDialogProvider from "../context/posts-dialog.context";
+import UserDialogProvider from "../context/user-dialog.context";
 
 export default function AppRouter() {
   const BreadCrumb = () => {
@@ -20,10 +24,31 @@ export default function AppRouter() {
     <Routes>
       <Route element={<BreadCrumb />}>
         <Route element={<PrivateRoute />}>
-          <Route path="/" element={<DashboardRoute />} />
+          <Route
+            path="/"
+            element={
+              <UserDialogProvider>
+                <DashboardRoute />
+              </UserDialogProvider>
+            }
+          />
           <Route path="/m/:id" element={<p>Private: User Profile</p>} />
-          <Route path="/posts" element={<p>Private: Posts</p>} />
-          <Route path="/categories" element={<CategoryRoute />} />
+          <Route
+            path="/posts"
+            element={
+              <PostDialogProvider>
+                <PostRoute />
+              </PostDialogProvider>
+            }
+          />
+          <Route
+            path="/categories"
+            element={
+              <CategoryDialogProvider>
+                <CategoryRoute />
+              </CategoryDialogProvider>
+            }
+          />
         </Route>
       </Route>
       <Route element={<AuthRoute />}>

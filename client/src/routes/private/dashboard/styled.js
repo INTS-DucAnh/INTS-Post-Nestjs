@@ -16,13 +16,14 @@ export const TemplateUserImage = styled.div`
   justify-content: center;
   align-items: center;
   display: flex;
+  position: relative;
   & > p {
     width: fit-content;
     height: fit-content;
     font-size: 0.7rem;
   }
   & > img {
-    object-fit: contain;
+    object-fit: cover;
     height: 100%;
     width: 100%;
   }
@@ -50,6 +51,9 @@ export const TemplateGender = styled.div`
   }
   &.f {
     background-color: var(--pink-500);
+    & > p {
+      color: white;
+    }
   }
   &.m {
     background-color: var(--teal-200);
@@ -70,6 +74,9 @@ export const TemplateRole = styled.div`
     background-color: var(--purple-200);
   }
   &.admin {
-    background-color: var(--teal-500);
+    background-color: var(--teal-400);
+    & > p {
+      color: white;
+    }
   }
 `;
