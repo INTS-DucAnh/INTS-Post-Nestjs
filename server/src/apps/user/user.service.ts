@@ -28,7 +28,6 @@ export class UserServices {
 
       existUser = await this.findUserById(userId);
     } else existUser = await this.findUser(data);
-
     if (!existUser) throw new BadRequestException('This use is not exist!');
 
     return existUser;
@@ -48,6 +47,25 @@ export class UserServices {
 
   findUser(findQuery: FindUserDto): Promise<Users> {
     return this.userRepository.findOneBy({ username: findQuery.username });
+  }
+
+  async findUserByFilter(skip: number, limit: number) {
+    const users = this.userRepository
+      .createQueryBuilder('users')
+      .innerJoinAndSelect('users.roles', 'roles')
+      .select([
+        'users.username',
+        'users.firstname',
+        'users.lastname',
+        'users.id',
+        'users.gender',
+        'users.avatar',
+        'roles.title',
+      ]);
+    return {
+      users: await users.limit(limit).skip(skip).getMany(),
+      max: await users.getCount(),
+    };
   }
 
   updateUser(updateQuery: UserDto) {
