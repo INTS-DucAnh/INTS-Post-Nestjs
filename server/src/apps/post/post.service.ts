@@ -1,5 +1,4 @@
 import {
-  BadGatewayException,
   BadRequestException,
   ForbiddenException,
   Injectable,
@@ -8,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Posts } from 'src/entity/post.entity';
 import { In, Repository } from 'typeorm';
 import { UpdatePostDto } from './dto/post-update.dto';
-import { ViewPostDto } from './dto/post-view.dto';
 import { jwtPayload } from '../auth/strategies/accesstoken.strategies';
 import { PostCategory } from 'src/entity/post-category.entity';
 import { PostCategoryDto } from './dto/post-category.dto';
@@ -166,6 +164,7 @@ export class PostService {
       category: categories,
     };
   }
+
   async deletePost(ids: string[]) {
     return this.postRepository.softDelete({ id: In(ids) });
   }
