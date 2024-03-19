@@ -9,3 +9,6 @@ body {
 p {
   margin: 0;
 }
+.required-tag{
+  color: var(--red-500);
+}
