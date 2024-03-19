@@ -40,9 +40,6 @@ export default function CategoryRoute() {
     await RequestApi({
       method: "DELETE",
       path: `category/${category.id}`,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
     }).then((res) => {
       if (res) {
         SetList((list) => list.filter((e) => e.od !== category.id));
@@ -52,12 +49,9 @@ export default function CategoryRoute() {
   };
 
   const onEdit = async (category) => {
-    await RequestApi({
+    RequestApi({
       method: "GET",
       path: `category/${category.id}`,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
     }).then((res) => {
       if (res) {
         SetVisibleDialog(true);
