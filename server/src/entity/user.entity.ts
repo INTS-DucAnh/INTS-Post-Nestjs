@@ -11,6 +11,7 @@ import { Roles } from './role.entity';
 import { Gender } from 'src/apps/auth/dto/auth-create.dto';
 import { Categories } from './category.entity';
 import { PostCategory } from './post-category.entity';
+import { Posts } from './post.entity';
 
 @Entity('users')
 export class Users {
@@ -60,9 +61,15 @@ export class Users {
   )
   updateCategories: Categories[];
 
-  @OneToMany(
-    () => PostCategory,
-    (postCategory: PostCategory) => postCategory.users,
-  )
-  updatePostCategory: PostCategory[];
+  @OneToMany(() => Posts, (posts: Posts) => posts.usersCreate)
+  createPosts: Posts[];
+
+  @OneToMany(() => Posts, (posts: Posts) => posts.usersUpdate)
+  updatePosts: Posts[];
+
+  // @OneToMany(
+  //   () => PostCategory,
+  //   (postCategory: PostCategory) => postCategory.users,
+  // )
+  // updatePostCategory: PostCategory[];
 }

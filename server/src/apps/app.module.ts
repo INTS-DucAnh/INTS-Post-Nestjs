@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module';
 import { PermissionModule } from './permission/permission.module';
 import { PostModule } from './post/post.module';
 import { CategoryModule } from './category/category.module';
+import { RoleModule } from './roles/roles.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { CategoryModule } from './category/category.module';
     UserModule,
     PostModule,
     CategoryModule,
+    RoleModule,
   ],
   controllers: [AppController],
   providers: [AppService],

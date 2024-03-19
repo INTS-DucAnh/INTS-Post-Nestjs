@@ -61,6 +61,13 @@ export class PostController {
 
   @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
   @UseGuards(AccessTokenGuard, PermissionGuard)
+  @Get('/:id')
+  getPost(@Param('id') id: number) {
+    return this.postService.getPostById(id);
+  }
+
+  @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
   @Post('/')
   async createUserPost(
     @Body() formPost: FormPostDto,
