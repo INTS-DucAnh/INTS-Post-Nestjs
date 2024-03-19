@@ -1,60 +1,41 @@
+import { Paginator } from "primereact/paginator";
 import SectionContent from "../../../component/section";
+import TableOfPosts from "./posts.table";
 import { useContext, useEffect, useState } from "react";
 import useRequestApi from "../../../hooks/useRequestApi";
+import PostDialog from "../../../component/post-dialog";
+import { PostDialogContext } from "../../../context/posts-dialog.context";
 import UseToken from "../../../hooks/useToken";
-import { Paginator } from "primereact/paginator";
-import TableOfCategory from "./category.table";
-import CategoryDialog from "../../../component/category-dialog";
-import CategoryDialogProvider, {
-  CategoryDialogContext,
-} from "../../../context/category-dialog.context";
 import { ToastContext } from "../../../context/toast.context";
 
-export default function CategoryRoute() {
-  const [list, SetList] = useState([]);
+export default function PostRoute() {
+  const [posts, SetPosts] = useState([]);
   const [limit, SetLimit] = useState(10);
   const [skip, SetSkip] = useState(0);
   const [max, SetMax] = useState(0);
   const [visibleDialog, SetVisibleDialog] = useState(false);
-  const { set, clear } = useContext(CategoryDialogContext);
-  const { getToken } = UseToken();
   const { showToast } = useContext(ToastContext);
+  const { getToken } = UseToken();
+  const { clear, set } = useContext(PostDialogContext);
   const { RequestApi } = useRequestApi();
 
-  const getListCategory = () => {
+  const getPosts = () => {
     RequestApi({
       method: "GET",
-      path: `category?limit=${limit}&skip=${skip}`,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
+      path: `post/find?limit=${limit}&skip=${skip}`,
+      accessToken: true,
     }).then((res) => {
       if (res) {
-        SetList(res.data.categories);
-        SetMax(res.data.count);
+        SetPosts(res.data.posts);
+        SetMax(res.data.max);
       }
     });
   };
 
-  const onDelete = async (category) => {
-    await RequestApi({
-      method: "DELETE",
-      path: `category/${category.id}`,
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    }).then((res) => {
-      if (res) {
-        SetList((list) => list.filter((e) => e.od !== category.id));
-        showToast("success", "Successful", "Deleted a category!");
-      }
-    });
-  };
-
-  const onEdit = async (category) => {
-    await RequestApi({
+  const onEdit = async (post) => {
+    RequestApi({
       method: "GET",
-      path: `category/${category.id}`,
+      path: `post/${post.id}`,
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -66,28 +47,42 @@ export default function CategoryRoute() {
     });
   };
 
+  const onDelete = (post) => {
+    RequestApi({
+      method: "DELETE",
+      path: `post?id=${post.id}`,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    }).then((res) => {
+      if (res) {
+        showToast("success", "Succesfull", "Deleted a post!");
+        clear();
+      }
+    });
+  };
   useEffect(() => {
-    getListCategory();
+    getPosts();
   }, []);
 
   return (
     <div>
       <SectionContent
-        title={"Category"}
+        title={"Posts"}
         onSelectCreate={() => SetVisibleDialog(true)}
-        onRefresh={() => getListCategory()}
+        onRefresh={() => getPosts()}
       >
-        <CategoryDialog
-          header="Category"
-          style={{ width: "300px" }}
+        <PostDialog
+          header="Post"
           visible={visibleDialog}
           onClose={() => {
             SetVisibleDialog(false);
             clear();
           }}
+          style={{ width: "95%", height: "95%" }}
         />
-        <TableOfCategory
-          list={list}
+        <TableOfPosts
+          posts={posts}
           onDelete={onDelete}
           onEdit={onEdit}
           max={max}
