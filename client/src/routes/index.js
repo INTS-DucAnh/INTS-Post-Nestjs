@@ -2,7 +2,6 @@ import { Routes, Route } from "react-router-dom";
 import PrivateRoute from "./private";
 import AuthRoute from "./auth";
 import LoginRoute from "./auth/login";
-import SignupRoute from "./auth/signup";
 import DashboardRoute from "./private/dashboard";
 import CategoryRoute from "./private/categories";
 import BreadcrumbProvider from "../context/breadcromb.context";
