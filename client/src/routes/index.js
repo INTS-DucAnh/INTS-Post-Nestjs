@@ -53,7 +53,7 @@ export default function AppRouter() {
       </Route>
       <Route element={<AuthRoute />}>
         <Route path="/login" element={<LoginRoute />} />
-        <Route path="/signup" element={<SignupRoute />} />
+        {/* <Route path="/signup" element={<SignupRoute />} /> */}
       </Route>
 
       <Route path="/*" element={<p>Route not found</p>} />
