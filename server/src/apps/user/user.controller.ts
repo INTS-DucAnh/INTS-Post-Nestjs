@@ -84,7 +84,7 @@ export class UserController {
     @Query('id') id: number,
     @Req() req: UserInRequest,
   ) {
-    if (req.user.id !== id)
+    if (!req.user.isAdmin && req.user.id !== id)
       throw new BadRequestException("You don't own this account");
     const existUsers = await this.userService.checkValidUser(id);
 
@@ -117,11 +117,18 @@ export class UserController {
   ) {
     if (req.user.id !== id && !req.user.isAdmin)
       throw new BadRequestException("You don't own this account");
-    const existUsers = await this.userService.checkValidUser(id);
+    if (!req.user.isAdmin && updateProfile.roleid === RoleTitleEnum.ADMIN)
+      throw new BadRequestException('Can not update from user to admin!');
 
+    const existUsers = await this.userService.checkValidUser(id);
+    let updateInfo = updateProfile;
+    if (updateInfo.password)
+      updateInfo.password = await argon2.hash(updateInfo.password);
+    else delete updateInfo.password;
+    delete existUsers.roles;
     const updateUser = await this.userService.updateUser({
       ...existUsers,
-      ...updateProfile,
+      ...updateInfo,
     });
 
     const { password, ...props } = updateUser;
@@ -168,7 +175,7 @@ export class UserController {
   async getUserProfile(@Param('id') id: number) {
     const existUser = await this.userService.checkValidUser(id);
 
-    const { password, username, ...props } = existUser;
+    const { password, ...props } = existUser;
     return props;
   }
 
@@ -177,7 +184,7 @@ export class UserController {
   @Delete('/:id')
   async deleteUser(@Param('id') id: number, @Req() req: UserInRequest) {
     if (req.user.id === id)
-      throw new BadRequestException('Can not delete Admin account!');
+      throw new BadRequestException('Can not delete your account!');
     const existUser = await this.userService.checkValidUser(id);
 
     const deleteUser = await this.userService.deleteUser(id);
