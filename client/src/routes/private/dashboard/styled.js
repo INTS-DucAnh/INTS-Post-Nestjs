@@ -71,10 +71,20 @@ export const TemplateRole = styled.div`
   }
 
   &.editor {
-    background-color: var(--purple-200);
+    background-color: var(--purple-500);
+    & > p {
+      color: white;
+    }
   }
   &.admin {
     background-color: var(--teal-400);
+    & > p {
+      color: white;
+    }
+  }
+
+  &.user {
+    background-color: var(--gray-500);
     & > p {
       color: white;
     }
