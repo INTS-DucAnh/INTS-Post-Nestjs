@@ -52,7 +52,7 @@ export default function useRequestApi() {
             ? "You need Permission!"
             : typeof json.message === "object"
             ? json.message[0]
-            : json.message
+            : json.message || "Some thing wrong"
         );
       return false;
     } catch (err) {
