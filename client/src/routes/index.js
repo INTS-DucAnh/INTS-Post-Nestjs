@@ -2,7 +2,6 @@ import { Routes, Route } from "react-router-dom";
 import PrivateRoute from "./private";
 import AuthRoute from "./auth";
 import LoginRoute from "./auth/login";
-import SignupRoute from "./auth/signup";
 import DashboardRoute from "./private/dashboard";
 import CategoryRoute from "./private/categories";
 import BreadcrumbProvider from "../context/breadcromb.context";
@@ -53,7 +52,7 @@ export default function AppRouter() {
       </Route>
       <Route element={<AuthRoute />}>
         <Route path="/login" element={<LoginRoute />} />
-        <Route path="/signup" element={<SignupRoute />} />
+        {/* <Route path="/signup" element={<SignupRoute />} /> */}
       </Route>
 
       <Route path="/*" element={<p>Route not found</p>} />

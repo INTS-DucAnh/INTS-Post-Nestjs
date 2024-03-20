@@ -63,9 +63,6 @@ export default function PrivateRoute() {
     return RequestApi({
       method: "GET",
       path: "auth/logout",
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
     }).then((res) => {
       if (res) {
         showToast("success", "Success!", "Logged out!");
@@ -80,9 +77,6 @@ export default function PrivateRoute() {
     RequestApi({
       method: "GET",
       path: "user",
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
     }).then((res) => {
       if (res) {
         SetUser(res.data);

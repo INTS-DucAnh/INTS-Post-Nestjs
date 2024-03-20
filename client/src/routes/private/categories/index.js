@@ -2,12 +2,9 @@ import SectionContent from "../../../component/section";
 import { useContext, useEffect, useState } from "react";
 import useRequestApi from "../../../hooks/useRequestApi";
 import UseToken from "../../../hooks/useToken";
-import { Paginator } from "primereact/paginator";
 import TableOfCategory from "./category.table";
 import CategoryDialog from "../../../component/category-dialog";
-import CategoryDialogProvider, {
-  CategoryDialogContext,
-} from "../../../context/category-dialog.context";
+import { CategoryDialogContext } from "../../../context/category-dialog.context";
 import { ToastContext } from "../../../context/toast.context";
 
 export default function CategoryRoute() {
