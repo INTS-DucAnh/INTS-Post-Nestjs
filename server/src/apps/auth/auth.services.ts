@@ -16,19 +16,20 @@ export class AuthServices {
     private configService: ConfigService,
   ) {}
 
-  async signup(createUser: CreateUserDto, roleid: number) {
+  async signup(createUser: CreateUserDto) {
+    const { roleid, ...user } = createUser;
     const userExists = await this.userService.findUser({
-      username: createUser.username,
+      username: user.username,
     });
     if (userExists) throw new BadRequestException('This user already exist!');
 
-    const hashPass = await this.hashData(createUser.password);
+    const hashPass = await this.hashData(user.password);
     const createAccount = await this.userService.createUser({
-      ...createUser,
+      ...user,
       avatar: '',
       password: hashPass,
       deletedat: null,
-      roleid: RolesIdEnum.EDITOR,
+      roleid: roleid,
     });
 
     const { password, ...props } = createAccount;

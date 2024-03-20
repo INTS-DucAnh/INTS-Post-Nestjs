@@ -19,7 +19,9 @@ import { RefreshTokenGuard } from 'src/guard/jwt/refreshtoken.guard';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { TimeUtil } from './utils/time.util';
-import { RolesIdEnum } from 'src/guard/permission/roles.enum';
+import { Roles } from 'src/guard/permission/permission.decorator';
+import { RoleTitleEnum } from '../permission/enum/permisison.enum';
+import { PermissionGuard } from 'src/guard/permission/permission.guard';
 
 @UseInterceptors(new ResponseInterceptor())
 @Controller('auth')
@@ -30,9 +32,11 @@ export class AuthController {
     private readonly timeUtil: TimeUtil,
   ) {}
 
-  @Post('signup')
+  @Roles([RoleTitleEnum.ADMIN])
+  @UseGuards(AccessTokenGuard, PermissionGuard)
+  @Post('create')
   signup(@Body() createUserDto: CreateUserDto) {
-    return this.authService.signup(createUserDto, RolesIdEnum.EDITOR);
+    return this.authService.signup(createUserDto);
   }
 
   @Post('login')

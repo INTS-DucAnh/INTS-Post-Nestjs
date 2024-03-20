@@ -6,6 +6,8 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsStrongPassword,
+  IsUrl,
   Validate,
 } from 'class-validator';
 import { UserGenderValidator } from '../validator/user-gender.validator';
@@ -17,7 +19,7 @@ export class UpdateUserDto {
   id: number;
 
   @IsOptional()
-  @IsDate()
+  @IsString()
   birthday?: Date;
 
   @IsOptional()
@@ -35,6 +37,17 @@ export class UpdateUserDto {
   @IsOptional()
   @IsBoolean()
   online?: boolean;
+
+  @IsOptional()
+  @IsStrongPassword()
+  password?: string;
+
+  @IsOptional()
+  avatar?: string;
+
+  @IsOptional()
+  @IsInt()
+  roleid?: number;
 }
 
 export type ChangPasswordDto = {

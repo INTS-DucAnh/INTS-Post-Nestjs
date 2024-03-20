@@ -1,5 +1,7 @@
 import {
+  IsInt,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsStrongPassword,
   Validate,
@@ -12,6 +14,9 @@ export enum Gender {
   OTHERS = 'O',
 }
 export class CreateUserDto {
+  @IsOptional()
+  avatar: string;
+
   @IsNotEmpty()
   @IsString()
   username: string;
@@ -35,4 +40,8 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   birthday: Date;
+
+  @IsNotEmpty()
+  @IsInt()
+  roleid: number;
 }

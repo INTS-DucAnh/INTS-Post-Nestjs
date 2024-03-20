@@ -3,8 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
 import { FindUserDto } from './dto/user-find.dto';
-import { ChangPasswordDto, UpdateUserDto } from './dto/user-update.dto';
-import { CreateUserDto } from '../auth/dto/auth-create.dto';
 import { UserDto } from './dto/user.dto';
 
 @Injectable()
@@ -36,13 +34,19 @@ export class UserServices {
   findDeletedUserById(id: number) {
     return this.userRepository
       .createQueryBuilder('users')
+      .innerJoinAndSelect('users.roles', 'roles')
       .withDeleted()
       .where('users.id = :id', { id: id })
       .getOne();
   }
 
   findUserById(id: number): Promise<Users> {
-    return this.userRepository.findOneBy({ id: id });
+    return this.userRepository
+      .createQueryBuilder('users')
+      .innerJoinAndSelect('users.roles', 'roles')
+      .select(['users', 'roles.id', 'roles.title'])
+      .where('users.id = :id', { id: id })
+      .getOne();
   }
 
   findUser(findQuery: FindUserDto): Promise<Users> {
@@ -63,7 +67,11 @@ export class UserServices {
         'roles.title',
       ]);
     return {
-      users: await users.limit(limit).skip(skip).getMany(),
+      users: await users
+        .limit(limit)
+        .skip(skip)
+        .orderBy('users.id', 'ASC')
+        .getMany(),
       max: await users.getCount(),
     };
   }
