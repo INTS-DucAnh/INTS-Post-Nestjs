@@ -16,8 +16,10 @@ export default function UserDialogProvider({ children }) {
 
   const clear = (user) => SetUser({});
 
+  const get = () => user;
+
   return (
-    <UserDialogContext.Provider value={{ set, change, clear, user }}>
+    <UserDialogContext.Provider value={{ set, change, clear, data: user }}>
       {children}
     </UserDialogContext.Provider>
   );
