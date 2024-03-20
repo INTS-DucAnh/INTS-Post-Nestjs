@@ -6,6 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import { ToastContext } from "../../context/toast.context";
 import FormHolder from "../form/index";
 import { UserFormFields } from "./form.fields";
+import DialogForm from "../dialog-form";
 
 export default function UserDialog({ ...props }) {
   const { data, change } = useContext(UserDialogContext);
@@ -39,7 +40,7 @@ export default function UserDialog({ ...props }) {
       },
     }).then((res) => {
       if (res) {
-        if (data.avatars) deleteImage([prevAva]);
+        if (data.avatars && prevAva) deleteImage([prevAva]);
         showToast("success", "Successfully", "Updated User");
         props.onClose();
       }
@@ -47,6 +48,7 @@ export default function UserDialog({ ...props }) {
   };
 
   const onConfirmCreate = async () => {
+    const prevAva = data.avatars ? data.avatars[0] : data.avatar;
     const { gender, roles, ...user } = data;
     await RequestApi({
       method: "POST",
@@ -65,6 +67,7 @@ export default function UserDialog({ ...props }) {
       },
     }).then((res) => {
       if (res) {
+        if (data.avatars && prevAva) deleteImage([prevAva]);
         showToast("success", "Successfully", "Created User");
         props.onClose();
       }
@@ -100,7 +103,12 @@ export default function UserDialog({ ...props }) {
   }, []);
 
   return (
-    <Dialog onHide={closeDialog} {...props}>
+    <DialogForm
+      {...props}
+      onClose={closeDialog}
+      onConfirm={data && data.id ? onConfirmEdit : onConfirmCreate}
+      style={{ width: "600px" }}
+    >
       <FormHolder
         formFields={UserFormFields}
         disableField={disableField[props.type]}
@@ -112,13 +120,6 @@ export default function UserDialog({ ...props }) {
           },
         }}
       />
-      <div>
-        <Button text label="Cancel" onClick={closeDialog} />
-        <Button
-          label="Confirm"
-          onClick={data.id ? onConfirmEdit : onConfirmCreate}
-        />
-      </div>
-    </Dialog>
+    </DialogForm>
   );
 }
