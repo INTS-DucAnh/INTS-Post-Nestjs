@@ -8,8 +8,8 @@ export const TemplateUser = styled.div`
 `;
 
 export const TemplateUserImage = styled.div`
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 2rem;
+  height: 2rem;
   border-radius: 100%;
   overflow: hidden;
   background: var(--cyan-100);
@@ -22,7 +22,11 @@ export const TemplateUserImage = styled.div`
     height: fit-content;
     font-size: 0.7rem;
   }
-  & > img {
+  & > span {
+    height: 100%;
+    width: 100%;
+  }
+  & > span > img {
     object-fit: cover;
     height: 100%;
     width: 100%;

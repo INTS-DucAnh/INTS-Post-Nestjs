@@ -10,6 +10,7 @@ import CategoryDialogProvider from "../context/category-dialog.context";
 import PostRoute from "./private/posts";
 import PostDialogProvider from "../context/posts-dialog.context";
 import UserDialogProvider from "../context/user-dialog.context";
+import ProfileRoute from "./private/profile";
 
 export default function AppRouter() {
   const BreadCrumb = () => {
@@ -31,7 +32,14 @@ export default function AppRouter() {
               </UserDialogProvider>
             }
           />
-          <Route path="/m/:id" element={<p>Private: User Profile</p>} />
+          <Route
+            path="/m"
+            element={
+              <UserDialogProvider>
+                <ProfileRoute />
+              </UserDialogProvider>
+            }
+          />
           <Route
             path="/posts"
             element={

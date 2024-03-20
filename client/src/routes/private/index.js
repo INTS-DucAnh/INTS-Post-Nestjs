@@ -15,6 +15,7 @@ import {
 } from "./dashboard/styled";
 import { BreadCrumb } from "primereact/breadcrumb";
 import { BreadcrumbContext } from "../../context/breadcromb.context";
+import { Image } from "primereact/image";
 
 const MenuTemplate = (item) => {
   return (
@@ -46,7 +47,7 @@ export default function PrivateRoute() {
         {
           label: "Settings",
           icon: "pi pi-cog",
-          click: () => navigate(`m/${user.id}`),
+          click: () => navigate(`m`),
           template: MenuTemplate,
         },
         {
@@ -94,7 +95,7 @@ export default function PrivateRoute() {
       <div className="h-auto w-auto">
         <NavPane />
       </div>
-      <div className="flex-1 overflow-y-scroll box-border p-4">
+      <div className="flex-1 overflow-y-scroll box-border p-4 relative">
         <HeadingRoute>
           <div>
             <BreadCrumb
@@ -116,7 +117,7 @@ export default function PrivateRoute() {
               <TemplateUser>
                 <TemplateUserImage>
                   {user.avatar ? (
-                    <img alt="user img" src={user.avatar} />
+                    <Image alt="user img" src={user.avatar} preview />
                   ) : (
                     <p>
                       {user.firstname && user.firstname[0].toUpperCase()}

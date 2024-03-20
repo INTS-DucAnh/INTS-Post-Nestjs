@@ -71,7 +71,6 @@ export default function DashboardRoute() {
       >
         <UserDialog
           header="User"
-          style={{ width: "40%" }}
           visible={visible}
           type={typeDialog}
           onClose={() => {
