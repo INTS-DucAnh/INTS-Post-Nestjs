@@ -165,7 +165,7 @@ export class UserController {
   async getMyProfile(@Req() req: UserInRequest) {
     const existUser = await this.userService.checkValidUser(req.user.id);
 
-    const { password, username, ...props } = existUser;
+    const { password, ...props } = existUser;
     return props;
   }
 

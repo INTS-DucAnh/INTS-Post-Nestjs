@@ -63,8 +63,10 @@ export class PostService {
   async findPost(skip: number, limit: number) {
     const query = this.postRepository
       .createQueryBuilder('posts')
-      .innerJoinAndSelect('posts.usersUpdate', 'userUpdate')
-      .innerJoinAndSelect('posts.usersCreate', 'userCreate')
+      .withDeleted()
+      .leftJoinAndSelect('posts.usersUpdate', 'userUpdate')
+      .withDeleted()
+      .leftJoinAndSelect('posts.usersCreate', 'userCreate')
       .leftJoinAndSelect('posts.categories', 'categories')
       .select([
         'posts.id',
@@ -82,12 +84,14 @@ export class PostService {
         'userUpdate.firstname',
         'userUpdate.lastname',
         'userUpdate.username',
-      ]);
+      ])
+      .where('posts.deletedat IS NULL');
 
     const [maxPage, findRes] = await Promise.all([
       query.getCount(),
-      query.skip(skip).limit(limit).getMany(),
+      query.skip(skip).take(limit).getMany(),
     ]);
+
     return {
       posts: findRes,
       max: maxPage,
@@ -95,7 +99,22 @@ export class PostService {
   }
 
   async getPostById(pid: number) {
-    return this.postRepository.findOneBy({ id: pid });
+    return this.postRepository
+      .createQueryBuilder('posts')
+      .leftJoinAndSelect('posts.categories', 'categories')
+      .select([
+        'posts.id',
+        'posts.thumbnail',
+        'posts.content',
+        'posts.title',
+        'posts.updateat',
+        'posts.createat',
+        'posts.createby',
+        'categories.id',
+        'categories.title',
+      ])
+      .where('posts.id = :id', { id: pid })
+      .getOne();
   }
 
   async getPostsUser(userid: number, skip: number = 0, limit: number = 10) {
@@ -140,14 +159,13 @@ export class PostService {
 
   async updatePost(user: jwtPayload, updatePost: UpdatePostDto) {
     const getPost = await this.getPostById(updatePost.id);
-    if (!user.isAdmin || !(user.id !== getPost.createby))
+    if (!user.isAdmin && user.id !== getPost.createby)
       throw new ForbiddenException('You are not owned this post!');
 
     const { categories, ...data } = updatePost;
     const newPost = await this.postRepository.save({
       ...getPost,
       ...data,
-      createby: user.id,
       updateby: user.id,
     });
     try {

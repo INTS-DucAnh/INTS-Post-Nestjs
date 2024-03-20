@@ -36,8 +36,8 @@ export class CategoryController {
   @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
   @UseGuards(AccessTokenGuard, PermissionGuard)
   @Get('/')
-  getCategory(@Query('skip') skip: number, @Query('limit') limit: number) {
-    return this.categoryService.findCategory(skip, limit);
+  getCategory() {
+    return this.categoryService.findCategory();
   }
 
   @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
