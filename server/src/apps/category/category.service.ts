@@ -41,7 +41,9 @@ export class CategoryService {
   async findCategory(skip: number = 0, limit: number = 10) {
     const query = this.categoryRepository
       .createQueryBuilder('categories')
+      .withDeleted()
       .innerJoinAndSelect('categories.usersUpdate', 'users1')
+      .withDeleted()
       .innerJoinAndSelect('categories.usersCreate', 'users2')
       .select([
         'categories.id',
@@ -56,13 +58,11 @@ export class CategoryService {
         'users2.avatar',
         'users2.firstname',
         'users2.lastname',
-      ]);
+      ])
+      .where('categories.deletedat IS NULL');
+
     return {
-      categories: await query
-        .orderBy('categories.id', 'ASC')
-        .limit(limit)
-        .skip(skip)
-        .getMany(),
+      categories: await query.orderBy('categories.id', 'ASC').getMany(),
       count: await query.getCount(),
     };
   }

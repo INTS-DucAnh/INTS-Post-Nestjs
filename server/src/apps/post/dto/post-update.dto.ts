@@ -17,7 +17,7 @@ export class UpdatePostDto {
   title?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
   thumbnail?: string;
 
   @IsOptional()

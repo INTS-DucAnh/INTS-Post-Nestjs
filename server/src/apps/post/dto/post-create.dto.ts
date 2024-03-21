@@ -17,7 +17,7 @@ export class FormPostDto {
   content: string;
 
   @IsNotEmpty()
-  @IsUrl()
+  @IsString()
   thumbnail: string;
 
   @IsNotEmpty({ message: 'Atleast 1 category should be provided!' })
