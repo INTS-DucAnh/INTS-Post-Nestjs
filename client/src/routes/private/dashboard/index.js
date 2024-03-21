@@ -6,6 +6,8 @@ import TableOfUser from "./user.table";
 import UserDialog from "../../../component/user-dialog";
 import { UserDialogContext } from "../../../context/user-dialog.context";
 import { ToastContext } from "../../../context/toast.context";
+import { ToastSuccess } from "../../../utils/toast.contstant";
+import { MESSAGE_CONSTANT } from "../../../utils/default.constant";
 
 export default function DashboardRoute() {
   const [list, SetList] = useState([]);
@@ -37,7 +39,7 @@ export default function DashboardRoute() {
     }).then((res) => {
       if (res) {
         clear();
-        showToast("success", "Successful", "Deleted a user");
+        showToast(ToastSuccess(MESSAGE_CONSTANT.user.deleted.success));
       }
     });
   };

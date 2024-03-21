@@ -5,6 +5,8 @@ import { Password } from "primereact/password";
 import { Image } from "primereact/image";
 import { styled } from "styled-components";
 import { FileUpload } from "primereact/fileupload";
+import { IMAGE_CONSTANT } from "../../utils/default.constant";
+import { CalSizeFile, getBase64 } from "../../utils/file.utils";
 const Gender = [
   { name: "Male", code: "M" },
   { name: "Female", code: "F" },
@@ -44,17 +46,21 @@ export const UserFormFields = {
                     {value ? <Image preview src={value} /> : <p>No Avatar</p>}
                   </AvatarHolder>
                   <FileUpload
-                    accept="image/*"
+                    accept={IMAGE_CONSTANT.type}
                     auto
                     chooseLabel="Browse"
                     mode="basic"
                     name="demo[]"
-                    maxFileSize={10000000}
+                    maxFileSize={CalSizeFile(
+                      `${IMAGE_CONSTANT.maxsize.size} ${IMAGE_CONSTANT.maxsize.unit}`
+                    )}
                     customUpload
-                    uploadHandler={(e) => {
-                      props.customeUpload("avatar", e).then((res) => {
-                        e.options.clear();
-                      });
+                    uploadHandler={async (e) => {
+                      const base64Img = await getBase64(e.files[0]);
+                      onChange({ target: { value: base64Img } });
+                      e.options.clear();
+                      props.customeUpload("_prev", value);
+                      props.customeUpload("_temp", e.files[0]);
                     }}
                   />
                 </AvatarFieldHolder>

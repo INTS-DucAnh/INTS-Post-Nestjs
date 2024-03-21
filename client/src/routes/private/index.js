@@ -16,6 +16,7 @@ import {
 import { BreadCrumb } from "primereact/breadcrumb";
 import { BreadcrumbContext } from "../../context/breadcromb.context";
 import { Image } from "primereact/image";
+import { ToastSuccess } from "../../utils/toast.contstant";
 
 const MenuTemplate = (item) => {
   return (
@@ -66,7 +67,7 @@ export default function PrivateRoute() {
       path: "auth/logout",
     }).then((res) => {
       if (res) {
-        showToast("success", "Success!", "Logged out!");
+        showToast(ToastSuccess("Logged out!"));
         SetUser({});
         clearToken();
         navigate("/login");

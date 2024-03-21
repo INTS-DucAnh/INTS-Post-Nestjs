@@ -1,7 +1,9 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ToastContext } from "../context/toast.context";
 import env from "react-dotenv";
 import UseToken from "./useToken";
+import { ToastError } from "../utils/toast.contstant";
+import { MESSAGE_CONSTANT } from "../utils/default.constant";
 
 export const config = {
   host: env.REACT_APP_BACKEND_HOST,
@@ -16,6 +18,7 @@ export default function useRequestApi() {
     path,
     data = {},
     formdata = null,
+    recall = true,
     ...props
   }) => {
     try {
@@ -33,27 +36,35 @@ export default function useRequestApi() {
         },
       });
       const json = await requestRes.json();
+
       if (json && json.success) {
         return json;
-      } else if (requestRes.status === 401 && json.message === "Unauthorized") {
-        await RequestAccessToken();
+      } else {
+        if (
+          requestRes.status === 401 &&
+          json.message === "Unauthorized" &&
+          recall
+        ) {
+          await RequestAccessToken();
 
-        return await RequestApi({
-          method,
-          path,
-          data,
-          ...options,
-        });
-      } else
+          return await RequestApi({
+            method,
+            path,
+            data,
+            formdata,
+            recall: false,
+            ...options,
+          });
+        }
+
         showToast(
-          "error",
-          "Error",
-          requestRes.status === 403
-            ? "You need Permission!"
-            : typeof json.message === "object"
-            ? json.message[0]
-            : json.message || "Some thing wrong"
+          ToastError(
+            typeof json.message === "object"
+              ? json.message[0]
+              : MESSAGE_CONSTANT.err(json.message)[requestRes.status]
+          )
         );
+      }
       return false;
     } catch (err) {
       console.log(err);
@@ -69,9 +80,9 @@ export default function useRequestApi() {
 
       const accessToken = await requestRes.json();
       if (accessToken && accessToken.success) {
-        setToken(accessToken.data);
+        return setToken(accessToken.data);
       }
-      return showToast("error", "Error", accessToken.message);
+      return showToast(ToastError(accessToken.message));
     } catch (err) {
       console.log(err);
     }

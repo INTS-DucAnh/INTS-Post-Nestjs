@@ -5,7 +5,7 @@ window.env = {
   APPDATA: "C:\\Users\\ducanh\\AppData\\Roaming",
   ChocolateyInstall: "C:\\ProgramData\\chocolatey",
   ChocolateyLastPathUpdate: "133361278224220091",
-  CHROME_CRASHPAD_PIPE_NAME: "\\\\.\\pipe\\crashpad_11292_AHILYNHXQWNMQKXN",
+  CHROME_CRASHPAD_PIPE_NAME: "\\\\.\\pipe\\crashpad_4220_MQGUGDRWXRMZERXW",
   COLOR: "1",
   COLORTERM: "truecolor",
   CommonProgramFiles: "C:\\Program Files\\Common Files",
