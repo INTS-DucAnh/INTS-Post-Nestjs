@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { FILE_CONSTANT } from 'src/config/app.constant';
 
 @Injectable()
 export class FileUtils {
@@ -7,12 +8,27 @@ export class FileUtils {
     const parsedSized = parseInt(size);
 
     switch (type) {
-      case 'gb':
-        return parsedSized * FileUtils.CalSizeFile('1024 mb');
-      case 'mb':
-        return parsedSized * FileUtils.CalSizeFile('1024 kb');
-      case 'kb':
-        return parsedSized * FileUtils.CalSizeFile('1024 b');
+      case FILE_CONSTANT.oneGigabyte.unit:
+        return (
+          parsedSized *
+          FileUtils.CalSizeFile(
+            `${FILE_CONSTANT.oneGigabyte.size} ${FILE_CONSTANT.oneGigabyte.child}`,
+          )
+        );
+      case FILE_CONSTANT.oneMegabyte.unit:
+        return (
+          parsedSized *
+          FileUtils.CalSizeFile(
+            `${FILE_CONSTANT.oneMegabyte.size} ${FILE_CONSTANT.oneMegabyte.child}`,
+          )
+        );
+      case FILE_CONSTANT.onKilobyte.unit:
+        return (
+          parsedSized *
+          FileUtils.CalSizeFile(
+            `${FILE_CONSTANT.onKilobyte.size} ${FILE_CONSTANT.onKilobyte.child}`,
+          )
+        );
       default:
         return parsedSized;
     }

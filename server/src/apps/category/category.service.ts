@@ -4,6 +4,7 @@ import { Categories } from 'src/entity/category.entity';
 import { Repository } from 'typeorm';
 import { CreateCategoryDto } from './dto/category-create.dto';
 import { CategoryDto } from './dto/category.dto';
+import { MESSAGE_CONSTANT } from 'src/config/app.constant';
 
 @Injectable()
 export class CategoryService {
@@ -15,11 +16,10 @@ export class CategoryService {
   async isValidCategory(id: number) {
     const existCategory = await this.findById(id);
     if (!existCategory)
-      throw new BadRequestException('This category is not exist!');
-    const parseCategory: CategoryDto = JSON.parse(
-      JSON.stringify(existCategory),
-    );
-    return parseCategory;
+      throw new BadRequestException(
+        MESSAGE_CONSTANT.targetNonExist('category'),
+      );
+    return existCategory;
   }
 
   findById(id: number) {

@@ -22,6 +22,7 @@ import { TimeUtil } from './utils/time.util';
 import { Roles } from 'src/guard/permission/permission.decorator';
 import { RoleTitleEnum } from '../permission/enum/permisison.enum';
 import { PermissionGuard } from 'src/guard/permission/permission.guard';
+import { COOKIES_CONSTANT } from 'src/config/app.constant';
 
 @UseInterceptors(new ResponseInterceptor())
 @Controller('auth')
@@ -38,21 +39,24 @@ export class AuthController {
   signup(@Body() createUserDto: CreateUserDto) {
     return this.authService.signup(createUserDto);
   }
-
   @Post('login')
   async login(
     @Body() data: AuthDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     const { accessToken, refreshToken } = await this.authService.login(data);
-    res.cookie(this.configService.get<string>('COOKIES_NAME'), refreshToken, {
-      maxAge: this.timeUtil.caltime(
-        this.configService.get<string>('COOKIES_EXPIRE'),
-      ),
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-    });
+    res.cookie(
+      this.configService.get<string>(COOKIES_CONSTANT.name),
+      refreshToken,
+      {
+        maxAge: this.timeUtil.caltime(
+          this.configService.get<string>(COOKIES_CONSTANT.expire),
+        ),
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+      },
+    );
 
     return accessToken;
   }
@@ -66,7 +70,7 @@ export class AuthController {
   @UseGuards(AccessTokenGuard)
   @Get('logout')
   logout(@Req() req: UserInRequest, @Res({ passthrough: true }) res: Response) {
-    res.clearCookie(this.configService.get<string>('COOKIES_NAME'));
+    res.clearCookie(this.configService.get<string>(COOKIES_CONSTANT.name));
     return this.authService.logout(req.user.id);
   }
 }

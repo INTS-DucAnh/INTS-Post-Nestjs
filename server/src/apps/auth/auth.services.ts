@@ -6,7 +6,8 @@ import { CreateUserDto } from './dto/auth-create.dto';
 import * as argon2 from 'argon2';
 import { AuthDto } from './dto/auth.dto';
 import { jwtPayload } from './strategies/accesstoken.strategies';
-import { RolesIdEnum } from 'src/guard/permission/roles.enum';
+import { MESSAGE_CONSTANT, TOKEN_CONSTANT } from 'src/config/app.constant';
+import { RoleTitleEnum } from '../permission/enum/permisison.enum';
 
 @Injectable()
 export class AuthServices {
@@ -21,12 +22,12 @@ export class AuthServices {
     const userExists = await this.userService.findUser({
       username: user.username,
     });
-    if (userExists) throw new BadRequestException('This user already exist!');
+    if (userExists)
+      throw new BadRequestException(MESSAGE_CONSTANT.auth.badrequest.exist);
 
     const hashPass = await this.hashData(user.password);
     const createAccount = await this.userService.createUser({
       ...user,
-      avatar: '',
       password: hashPass,
       deletedat: null,
       roleid: roleid,
@@ -45,7 +46,13 @@ export class AuthServices {
       userExists.password,
       userLogin.password,
     );
-    if (!passwordMatch) throw new BadRequestException('Password is incorrect!');
+    if (!passwordMatch)
+      throw new BadRequestException(
+        MESSAGE_CONSTANT.auth.badrequest.incorrect('Password'),
+      );
+    if (userExists.roleid === RoleTitleEnum.USER) {
+      throw new BadRequestException(MESSAGE_CONSTANT.permission.notAllow);
+    }
 
     const token = {
       accessToken: await this.genAToken(
@@ -54,9 +61,11 @@ export class AuthServices {
           username: userExists.username,
           sub: userExists.id.toString(),
         },
-        this.configService.get<string>('SECRET_ACCESS_TOKEN'),
+        this.configService.get<string>(TOKEN_CONSTANT.jwt.access.secret),
         {
-          expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRE'),
+          expiresIn: this.configService.get<string>(
+            TOKEN_CONSTANT.jwt.access.expire,
+          ),
         },
       ),
       refreshToken: await this.genAToken(
@@ -65,9 +74,11 @@ export class AuthServices {
           username: userExists.username,
           sub: userExists.id.toString(),
         },
-        this.configService.get<string>('SECRET_REFRESH_TOKEN'),
+        this.configService.get<string>(TOKEN_CONSTANT.jwt.refresh.secret),
         {
-          expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRE'),
+          expiresIn: this.configService.get<string>(
+            TOKEN_CONSTANT.jwt.refresh.expire,
+          ),
         },
       ),
     };
@@ -84,16 +95,17 @@ export class AuthServices {
 
   async refreshAccessToken(userid: number) {
     const userExists = await this.userService.checkValidUser(userid);
-    if (!userExists) throw new BadRequestException('This user is not exist!');
     return await this.genAToken(
       {
         id: userExists.id,
         username: userExists.username,
         sub: userExists.id.toString(),
       },
-      this.configService.get<string>('SECRET_ACCESS_TOKEN'),
+      this.configService.get<string>(TOKEN_CONSTANT.jwt.access.secret),
       {
-        expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRE'),
+        expiresIn: this.configService.get<string>(
+          TOKEN_CONSTANT.jwt.access.expire,
+        ),
       },
     );
   }

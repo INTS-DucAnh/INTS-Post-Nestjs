@@ -4,6 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { jwtPayload } from './accesstoken.strategies';
 import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { MESSAGE_CONSTANT } from 'src/config/app.constant';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -23,7 +24,10 @@ export class RefreshTokenStrategy extends PassportStrategy(
   validate(req: Request, payload: jwtPayload) {
     const refreshToken: string =
       RefreshTokenStrategy.extractJWTFromCookies(req);
-    if (!req) throw new ForbiddenException('Can not find refresh token');
+    if (!req)
+      throw new ForbiddenException(
+        MESSAGE_CONSTANT.jwt.forbidden.invalid('refresh'),
+      );
 
     return { ...payload, refreshToken };
   }

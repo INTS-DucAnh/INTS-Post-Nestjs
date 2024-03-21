@@ -30,6 +30,7 @@ import { FileUtils } from './util/file.utils';
 import { PermissionGuard } from 'src/guard/permission/permission.guard';
 import { Roles } from 'src/guard/permission/permission.decorator';
 import { RoleTitleEnum } from '../permission/enum/permisison.enum';
+import { IMAGE_CONSTANT } from 'src/config/app.constant';
 
 @UseInterceptors(new ResponseInterceptor())
 @Controller('/post')
@@ -97,8 +98,10 @@ export class PostController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: FileUtils.CalSizeFile('20 mb') }),
-          new FileTypeValidator({ fileType: /(jpg|jpeg|png)$/ }),
+          new MaxFileSizeValidator({
+            maxSize: FileUtils.CalSizeFile(IMAGE_CONSTANT.maxsize.upload),
+          }),
+          new FileTypeValidator({ fileType: IMAGE_CONSTANT.filetype }),
         ],
       }),
     )

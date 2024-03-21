@@ -4,6 +4,7 @@ import { Users } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
 import { FindUserDto } from './dto/user-find.dto';
 import { UserDto } from './dto/user.dto';
+import { MESSAGE_CONSTANT } from 'src/config/app.constant';
 
 @Injectable()
 export class UserServices {
@@ -11,6 +12,12 @@ export class UserServices {
     @InjectRepository(Users) private readonly userRepository: Repository<Users>,
   ) {}
 
+  isOwnAccount(conditions: boolean) {
+    if (conditions)
+      throw new BadRequestException(
+        MESSAGE_CONSTANT.permission.notOwn('account'),
+      );
+  }
   async checkValidUser(
     data: FindUserDto | string | number,
     deleted: boolean = false,
@@ -22,11 +29,13 @@ export class UserServices {
       else existUser = await this.findUserById(data);
     } else if (typeof data === 'string') {
       const userId = parseInt(data) || 0;
-      if (!userId) throw new BadRequestException('Invalid query!');
+      if (!userId)
+        throw new BadRequestException(MESSAGE_CONSTANT.param.invalid('userid'));
 
       existUser = await this.findUserById(userId);
     } else existUser = await this.findUser(data);
-    if (!existUser) throw new BadRequestException('This use is not exist!');
+    if (!existUser)
+      throw new BadRequestException(MESSAGE_CONSTANT.targetNonExist('user'));
 
     return existUser;
   }

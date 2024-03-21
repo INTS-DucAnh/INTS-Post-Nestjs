@@ -5,5 +5,5 @@ export type CategoryDto = {
   createby: number;
   createat: Date;
   updateat: Date;
-  delete: boolean;
+  deletedat: Date;
 };
