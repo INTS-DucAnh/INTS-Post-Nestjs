@@ -8,33 +8,8 @@ import {
 } from "./styled";
 
 const RenderFields = ({ fields, data, onFieldChange, ...props }) => {
-  const { RequestApi } = useRequestApi();
-
-  const customUpload = async (field, e) => {
-    const formData = new FormData();
-    const image = e.files[0];
-    const filename = `${uuidv4()}-${field}.jpg`;
-    const renamedFile = new File([image], filename, {
-      type: image.type,
-    });
-
-    // Update the formData object
-    formData.append("image", renamedFile);
-    const defaultImage = data[field] || "";
-
-    await RequestApi({
-      method: "POST",
-      path: `post/s3-upload`,
-      formdata: formData,
-    }).then((res) => {
-      if (res) {
-        onFieldChange(field, res.data.url);
-        onFieldChange(`${field}s`, [
-          ...(data[`${field}s`] || [defaultImage]),
-          filename,
-        ]);
-      }
-    });
+  const customUpload = async (field, file) => {
+    onFieldChange(field, file);
   };
 
   return (

@@ -4,6 +4,8 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { MultiSelect } from "primereact/multiselect";
 import { styled } from "styled-components";
+import { CalSizeFile, getBase64 } from "../../utils/file.utils";
+import { IMAGE_CONSTANT } from "../../utils/default.constant";
 
 const mapCategoriesToOption = (categories) => {
   return categories.map((cate) => ({
@@ -37,17 +39,21 @@ export const PostFormFields = {
                     {value ? <Image preview src={value} /> : <p>No Avatar</p>}
                   </Thumbnail>
                   <FileUpload
-                    accept="image/*"
+                    accept={IMAGE_CONSTANT.type}
                     auto
                     chooseLabel="Browse"
                     mode="basic"
                     name="demo[]"
-                    maxFileSize={10000000}
+                    maxFileSize={CalSizeFile(
+                      `${IMAGE_CONSTANT.maxsize.size} ${IMAGE_CONSTANT.maxsize.unit}`
+                    )}
                     customUpload
-                    uploadHandler={(e) => {
-                      props.customeUpload("thumbnail", e).then((res) => {
-                        e.options.clear();
-                      });
+                    uploadHandler={async (e) => {
+                      const base64Img = await getBase64(e.files[0]);
+                      onChange({ target: { value: base64Img } });
+                      e.options.clear();
+
+                      props.customeUpload("_temp", e.files[0]);
                     }}
                   />
                 </ThumbnailHolder>
