@@ -7,6 +7,8 @@ import { Password } from "primereact/password";
 import { useNavigate } from "react-router-dom";
 import UseToken from "../../../hooks/useToken";
 import useRequestApi from "../../../hooks/useRequestApi";
+import { Image } from "primereact/image";
+import { ImageForm, LoginForm, LoginFormHolder, LoginMainForm } from "./styled";
 
 export default function LoginRoute() {
   const { authForm, handleChangeAuthForm } = useContext(AuthContext);
@@ -36,34 +38,41 @@ export default function LoginRoute() {
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <div className="flex flex-row gap-2 align-items-center">
-          <label htmlFor="username">Username</label>
-          <InputText
-            placeholder="Username"
-            value={authForm.username || ""}
-            onChange={(e) => handleChangeAuthForm("username", e.target.value)}
-          />
-        </div>
-        <div className="flex flex-row gap-2 align-items-center">
-          <label htmlFor="username">Password</label>
-          <Password
-            placeholder="Password"
-            value={authForm.password || ""}
-            onChange={(e) => handleChangeAuthForm("password", e.target.value)}
-            feedback={false}
-          />
-        </div>
+    <LoginFormHolder>
+      <LoginForm onSubmit={handleSubmit}>
+        <ImageForm>
+          <Image src="https://img.freepik.com/free-vector/dark-green-background-design_1107-162.jpg?t=st=1710926687~exp=1710930287~hmac=2395d43d8887fb9a561a849dd53c59e71ed966bc2804bf855bf07ccfb021517b&w=826" />
+        </ImageForm>
+        <LoginMainForm>
+          <h1>Login</h1>
+          <div className="">
+            <label htmlFor="username">Username</label>
+            <InputText
+              placeholder="Username"
+              value={authForm.username || ""}
+              onChange={(e) => handleChangeAuthForm("username", e.target.value)}
+            />
+          </div>
+          <div className="">
+            <label htmlFor="username">Password</label>
+            <Password
+              placeholder="Password"
+              value={authForm.password || ""}
+              onChange={(e) => handleChangeAuthForm("password", e.target.value)}
+              feedback={false}
+              toggleMask
+            />
+          </div>
 
-        <Button label="Login" type="submit" className="p-button-info" />
-      </form>
-      <Button
+          <Button label="Login" type="submit" className="p-button-info" />
+        </LoginMainForm>
+      </LoginForm>
+      {/* <Button
         label="Signup"
         className="p-button-info"
         link
         onClick={() => navigate("/signup")}
-      />
-    </div>
+      /> */}
+    </LoginFormHolder>
   );
 }

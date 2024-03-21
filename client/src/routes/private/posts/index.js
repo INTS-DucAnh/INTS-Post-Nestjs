@@ -79,7 +79,6 @@ export default function PostRoute() {
             SetVisibleDialog(false);
             clear();
           }}
-          style={{ width: "95%", height: "95%" }}
         />
         <TableOfPosts
           posts={posts}
