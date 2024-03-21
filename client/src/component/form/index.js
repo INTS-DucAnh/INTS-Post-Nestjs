@@ -1,5 +1,11 @@
 import useRequestApi from "../../hooks/useRequestApi";
 import { v4 as uuidv4 } from "uuid";
+import {
+  FieldsInGroupDialog,
+  FormDialogHolder,
+  GroupsFieldDialog,
+  SectionDialog,
+} from "./styled";
 
 const RenderFields = ({ fields, data, onFieldChange, ...props }) => {
   const { RequestApi } = useRequestApi();
@@ -14,7 +20,7 @@ const RenderFields = ({ fields, data, onFieldChange, ...props }) => {
 
     // Update the formData object
     formData.append("image", renamedFile);
-    const userImage = data.avatar || "";
+    const defaultImage = data[field] || "";
 
     await RequestApi({
       method: "POST",
@@ -24,7 +30,7 @@ const RenderFields = ({ fields, data, onFieldChange, ...props }) => {
       if (res) {
         onFieldChange(field, res.data.url);
         onFieldChange(`${field}s`, [
-          ...(data[`${field}s`] || [userImage]),
+          ...(data[`${field}s`] || [defaultImage]),
           filename,
         ]);
       }
@@ -32,11 +38,12 @@ const RenderFields = ({ fields, data, onFieldChange, ...props }) => {
   };
 
   return (
-    <div>
+    <FieldsInGroupDialog>
       {fields.map((f) => {
         const { Component, ...field } = f;
         return (
-          <span className="p-float-label" key={field.field}>
+          <span className="flex flex-column gap-2" key={field.field}>
+            <label htmlFor={field.field}>{field.label}</label>
             <Component
               inputId={field.field}
               value={data[field.field] || ""}
@@ -45,16 +52,16 @@ const RenderFields = ({ fields, data, onFieldChange, ...props }) => {
               customeUpload={field.uploadImage ? customUpload : null}
               {...props}
             />
-            <label htmlFor={field.field}>{field.label}</label>
           </span>
         );
       })}
-    </div>
+    </FieldsInGroupDialog>
   );
 };
+
 const RenderGroups = ({ groups, data, onFieldChange, ...props }) => {
   return (
-    <div>
+    <GroupsFieldDialog>
       {groups.map((gr) => (
         <RenderFields
           fields={gr}
@@ -63,7 +70,7 @@ const RenderGroups = ({ groups, data, onFieldChange, ...props }) => {
           {...props}
         />
       ))}
-    </div>
+    </GroupsFieldDialog>
   );
 };
 
@@ -76,7 +83,7 @@ const FormSection = ({
   ...props
 }) => {
   return (
-    <section>
+    <SectionDialog>
       <div>
         <p>
           {heading}
@@ -91,7 +98,7 @@ const FormSection = ({
           {...props}
         />
       </div>
-    </section>
+    </SectionDialog>
   );
 };
 
@@ -103,7 +110,7 @@ export default function FormHolder({
   extraDataField,
 }) {
   return (
-    <div>
+    <FormDialogHolder>
       {formFields.section.map((section) => (
         <div key={section.name}>
           <FormSection
@@ -118,6 +125,6 @@ export default function FormHolder({
           />
         </div>
       ))}
-    </div>
+    </FormDialogHolder>
   );
 }

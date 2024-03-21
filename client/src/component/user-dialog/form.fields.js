@@ -53,7 +53,7 @@ export const UserFormFields = {
                     customUpload
                     uploadHandler={(e) => {
                       props.customeUpload("avatar", e).then((res) => {
-                        console.log(e.options.clear());
+                        e.options.clear();
                       });
                     }}
                   />
@@ -164,7 +164,7 @@ export const UserFormFields = {
             label: "Password",
             field: "password",
             Component: ({ ...props }) => (
-              <Password feedback={false} {...props} />
+              <Password feedback={false} {...props} toggleMask />
             ),
             require: true,
           },
@@ -174,7 +174,7 @@ export const UserFormFields = {
   ],
 };
 
-const AvatarFieldHolder = styled.div`
+export const AvatarFieldHolder = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -183,7 +183,7 @@ const AvatarFieldHolder = styled.div`
   gap: 5px;
 `;
 
-const AvatarHolder = styled.div`
+export const AvatarHolder = styled.div`
   & > span {
     width: 100px;
     height: 100px;
