@@ -6,6 +6,8 @@ import TableOfCategory from "./category.table";
 import CategoryDialog from "../../../component/category-dialog";
 import { CategoryDialogContext } from "../../../context/category-dialog.context";
 import { ToastContext } from "../../../context/toast.context";
+import { ToastSuccess } from "../../../utils/toast.contstant";
+import { MESSAGE_CONSTANT } from "../../../utils/default.constant";
 
 export default function CategoryRoute() {
   const [list, SetList] = useState([]);
@@ -40,7 +42,7 @@ export default function CategoryRoute() {
     }).then((res) => {
       if (res) {
         SetList((list) => list.filter((e) => e.od !== category.id));
-        showToast("success", "Successful", "Deleted a category!");
+        showToast(ToastSuccess(MESSAGE_CONSTANT.category.deleted.success));
       }
     });
   };

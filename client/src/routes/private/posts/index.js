@@ -7,6 +7,8 @@ import PostDialog from "../../../component/post-dialog";
 import { PostDialogContext } from "../../../context/posts-dialog.context";
 import UseToken from "../../../hooks/useToken";
 import { ToastContext } from "../../../context/toast.context";
+import { ToastSuccess } from "../../../utils/toast.contstant";
+import { MESSAGE_CONSTANT } from "../../../utils/default.constant";
 
 export default function PostRoute() {
   const [posts, SetPosts] = useState([]);
@@ -56,7 +58,7 @@ export default function PostRoute() {
       },
     }).then((res) => {
       if (res) {
-        showToast("success", "Succesfull", "Deleted a post!");
+        showToast(ToastSuccess(MESSAGE_CONSTANT.post.deleted.success));
         clear();
       }
     });

@@ -14,6 +14,7 @@ import { ConfigService } from '@nestjs/config';
 import { S3Utils } from './util/s3.util';
 import { FormPostDto } from './dto/post-create.dto';
 import { ImagesToS3 } from './dto/post-image.dto';
+import { MESSAGE_CONSTANT, S3_CONSTANT } from 'src/config/app.constant';
 
 @Injectable()
 export class PostService {
@@ -25,12 +26,13 @@ export class PostService {
   ) {}
 
   async attachCategoryToPosts(cid: number[], postid: number, userid: number) {
-    const deleteCategory = await this.postCategoryRepository.query(
-      `DELETE FROM "post-category" WHERE "poid" = $1`,
-      [postid],
-    );
+    const deleteCategory = await this.postCategoryRepository
+      .createQueryBuilder()
+      .delete()
+      .from('post-category')
+      .where('poid = :postid', { postid })
+      .execute();
 
-    const updateDate = new Date();
     const posts: PostCategoryDto[] = cid.map((id: number) => ({
       poid: postid,
       cid: id,
@@ -45,7 +47,7 @@ export class PostService {
   async uploadImage(file: ImagesToS3) {
     const uploaded = await S3Utils.uploadImageToS3(
       [file],
-      this.configService.get<string>('S3_BUCKET_NAME'),
+      this.configService.get<string>(S3_CONSTANT.bucket.name),
     );
     return {
       url: uploaded[0].Location,
@@ -55,7 +57,7 @@ export class PostService {
   async deleteImage(filename: string) {
     const deleted = await S3Utils.deleteImageFromS3(
       [filename],
-      this.configService.get<string>('S3_BUCKET_NAME'),
+      this.configService.get<string>(S3_CONSTANT.bucket.name),
     );
     return deleted;
   }
@@ -89,7 +91,7 @@ export class PostService {
 
     const [maxPage, findRes] = await Promise.all([
       query.getCount(),
-      query.skip(skip).take(limit).getMany(),
+      query.skip(skip).take(limit).orderBy('posts.id', 'ASC').getMany(),
     ]);
 
     return {
@@ -160,7 +162,7 @@ export class PostService {
   async updatePost(user: jwtPayload, updatePost: UpdatePostDto) {
     const getPost = await this.getPostById(updatePost.id);
     if (!user.isAdmin && user.id !== getPost.createby)
-      throw new ForbiddenException('You are not owned this post!');
+      throw new ForbiddenException(MESSAGE_CONSTANT.permission.notOwn('post'));
 
     const { categories, ...data } = updatePost;
     const newPost = await this.postRepository.save({
@@ -175,7 +177,9 @@ export class PostService {
         user.id,
       );
     } catch (err) {
-      throw new BadRequestException('Not exist category!');
+      throw new BadRequestException(
+        MESSAGE_CONSTANT.targetNonExist('category'),
+      );
     }
     return {
       post: newPost,

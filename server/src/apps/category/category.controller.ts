@@ -23,6 +23,7 @@ import { AccessTokenGuard } from 'src/guard/jwt/accesstoken.guard';
 import { Roles } from 'src/guard/permission/permission.decorator';
 import { RoleTitleEnum } from '../permission/enum/permisison.enum';
 import { PermissionGuard } from 'src/guard/permission/permission.guard';
+import { MESSAGE_CONSTANT } from 'src/config/app.constant';
 
 @UseInterceptors(new ResponseInterceptor())
 @Controller('/category')
@@ -58,16 +59,16 @@ export class CategoryController {
       updateCategory.id,
     );
 
-    if (validCate.createby === req.user.id || req.user.isAdmin) {
-      const [updateby, updateat] = [req.user.id, new Date()];
-      return this.categoryService.updateCategory({
-        ...validCate,
-        ...updateCategory,
-        updateby: updateby,
-        updateat: updateat,
-      });
-    } else
-      throw new ForbiddenException("You don't have permission to do this!");
+    if (!req.user.isAdmin && validCate.createby !== req.user.id)
+      throw new ForbiddenException(MESSAGE_CONSTANT.permission.notAllow);
+
+    const [updateby, updateat] = [req.user.id, new Date()];
+    return this.categoryService.updateCategory({
+      ...validCate,
+      ...updateCategory,
+      updateby: updateby,
+      updateat: updateat,
+    });
   }
 
   @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])

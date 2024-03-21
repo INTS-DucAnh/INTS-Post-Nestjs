@@ -5,8 +5,8 @@ export const ToastContext = createContext();
 
 export default function ToastProvider({ children }) {
   const toastRef = useRef();
-  const showToast = (severity, summary, detail) => {
-    toastRef.current.show({ severity, summary, detail });
+  const showToast = (toast) => {
+    toastRef.current.show(toast);
   };
   return (
     <ToastContext.Provider value={{ showToast }}>

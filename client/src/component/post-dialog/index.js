@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import useRequestApi from "../../hooks/useRequestApi";
-import UseToken from "../../hooks/useToken";
 import { ToastContext } from "../../context/toast.context";
 import { PostDialogContext } from "../../context/posts-dialog.context";
 import DialogForm from "../dialog-form";
 import FormHolder from "../form";
 import { PostFormFields } from "./form.fields";
+import { ToastSuccess } from "../../utils/toast.contstant";
+import { v4 as uuidv4 } from "uuid";
 
 export default function PostDialog({ ...props }) {
   const [categories, SetCategories] = useState([]);
@@ -37,8 +38,34 @@ export default function PostDialog({ ...props }) {
     props.onClose();
   };
 
+  const processTempImages = async () => {
+    let thumbnail = post.thumbnail || "";
+    let session = uuidv4();
+
+    if (post._temp) {
+      let temp = new File([post._temp], session, { type: post._temp.type });
+      delete post._temp;
+      delete post._prev;
+
+      const newThumbnail = await uploadImage([temp]);
+      thumbnail = newThumbnail[0].data.url;
+    }
+
+    return {
+      thumbnail,
+      session,
+      categories: post.categories,
+      content: post.content,
+      title: post.title,
+    };
+  };
+
   const onConfirmEdit = async () => {
-    const prevAva = post.thumbnails ? post.thumbnails[0] : post.avatar;
+    if (post._prev) {
+      const host = post._prev.split("/");
+      await deleteImage([host.pop()]);
+    }
+    const { thumbnail, session } = await processTempImages();
 
     await RequestApi({
       method: "PUT",
@@ -47,7 +74,7 @@ export default function PostDialog({ ...props }) {
         content: post.content,
         title: post.title,
         id: post.id,
-        thumbnail: post.thumbnail,
+        thumbnail: thumbnail,
         categories: post.categories
           ? post.categories.map((e) => {
               if (e.id) return e.id;
@@ -60,21 +87,26 @@ export default function PostDialog({ ...props }) {
       },
     }).then((res) => {
       if (res) {
-        if (post.thumbnails && prevAva) deleteImage([prevAva]);
-        showToast("success", "Successfully", "Updated Post");
+        showToast(ToastSuccess("Updated Post"));
         props.onClose();
+      } else {
+        deleteImage([session]);
       }
     });
   };
 
   const onConfirmCreate = async () => {
-    const { categories, ...postData } = post;
-    const prevAva = post.thumbnails ? post.thumbnails[0] : post.avatar;
+    const { thumbnail, session, categories, ...postData } =
+      await processTempImages();
+
+    console.log({ thumbnail, session, categories, ...postData });
+
     await RequestApi({
       method: "POST",
       path: `post`,
       data: {
         ...postData,
+        thumbnail,
         categories: categories
           ? categories.map((e) => {
               if (e.id) return e.id;
@@ -87,9 +119,10 @@ export default function PostDialog({ ...props }) {
       },
     }).then((res) => {
       if (res) {
-        if (post.thumbnails && prevAva) deleteImage([prevAva]);
-        showToast("success", "Successfully", "Created Category");
+        showToast(ToastSuccess("Created Category"));
         closeDialog();
+      } else {
+        deleteImage([session]);
       }
     });
   };
@@ -105,6 +138,23 @@ export default function PostDialog({ ...props }) {
       )
     );
     return deleteSessionImage;
+  };
+
+  const uploadImage = async (images) => {
+    if (!images) return;
+    const uploadedImage = await Promise.all(
+      images.map((i) => {
+        const form = new FormData();
+        form.append("image", i);
+
+        return RequestApi({
+          method: "POST",
+          path: `post/s3-upload`,
+          formdata: form,
+        });
+      })
+    );
+    return uploadedImage;
   };
 
   useEffect(() => {

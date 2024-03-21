@@ -9,6 +9,7 @@ import UseToken from "../../../hooks/useToken";
 import useRequestApi from "../../../hooks/useRequestApi";
 import { Image } from "primereact/image";
 import { ImageForm, LoginForm, LoginFormHolder, LoginMainForm } from "./styled";
+import { ToastSuccess } from "../../../utils/toast.contstant";
 
 export default function LoginRoute() {
   const { authForm, handleChangeAuthForm } = useContext(AuthContext);
@@ -31,7 +32,7 @@ export default function LoginRoute() {
       },
     });
     if (loginRes) {
-      showToast("success", "Success", "Login successful!");
+      showToast(ToastSuccess("Login successful!"));
       setToken(loginRes.data);
       navigate("/");
     }

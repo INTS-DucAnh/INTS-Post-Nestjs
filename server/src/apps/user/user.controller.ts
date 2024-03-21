@@ -21,13 +21,11 @@ import { ChangPasswordDto, UpdateUserDto } from './dto/user-update.dto';
 import { UserInRequest } from 'src/config/req-res.config';
 import { AccessTokenGuard } from 'src/guard/jwt/accesstoken.guard';
 import { ResponseInterceptor } from 'src/interceptor/response.interceptor';
-import { FileUtils } from '../post/util/file.utils';
 import { ConfigService } from '@nestjs/config';
-import { S3Utils } from '../post/util/s3.util';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from 'src/guard/permission/permission.decorator';
 import { RoleTitleEnum } from '../permission/enum/permisison.enum';
 import { PermissionGuard } from 'src/guard/permission/permission.guard';
+import { MESSAGE_CONSTANT } from 'src/config/app.constant';
 
 @UseInterceptors(new ResponseInterceptor())
 @Controller('/user')
@@ -39,53 +37,14 @@ export class UserController {
 
   @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
   @UseGuards(AccessTokenGuard, PermissionGuard)
-  @UseInterceptors(FileInterceptor('image'))
-  @Put('/avatar')
-  async uploadAvatar(
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: FileUtils.CalSizeFile('10 mb') }),
-          new FileTypeValidator({ fileType: /(jpg|jpeg|png)$/ }),
-        ],
-      }),
-    )
-    image: Express.Multer.File,
-    @Req() req: UserInRequest,
-  ) {
-    const existUsers = await this.userService.checkValidUser(req.user.id);
-
-    const uploadImage = await S3Utils.uploadImageToS3(
-      [
-        {
-          filename: this.configService
-            .get<string>('S3_BUCKET_USER')
-            .replaceAll(':userid', req.user.id.toString())
-            .replace(':filetype', 'png'),
-          image: image,
-        },
-      ],
-      this.configService.get<string>('S3_BUCKET_NAME'),
-    );
-
-    const { password, username, ...props } = await this.userService.updateUser({
-      ...existUsers,
-      avatar: uploadImage[0].Location,
-    });
-
-    return props;
-  }
-
-  @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
-  @UseGuards(AccessTokenGuard, PermissionGuard)
   @Put('/pass')
   async changePasswordUser(
     @Body() changePassword: ChangPasswordDto,
     @Query('id') id: number,
     @Req() req: UserInRequest,
   ) {
-    if (!req.user.isAdmin && req.user.id !== id)
-      throw new BadRequestException("You don't own this account");
+    this.userService.isOwnAccount(!req.user.isAdmin && req.user.id !== id);
+
     const existUsers = await this.userService.checkValidUser(id);
 
     if (changePassword.newPassword && changePassword.oldPassword) {
@@ -102,9 +61,12 @@ export class UserController {
             'New password and current password is duplicated!',
           );
       } else throw new BadRequestException('Current password is not match!');
-    } else throw new BadRequestException('Invalid request body!');
+    } else
+      throw new BadRequestException(
+        MESSAGE_CONSTANT.param.invalid('request-body'),
+      );
 
-    return { message: 'Succesfully update password!' };
+    return { message: MESSAGE_CONSTANT.user.success.update };
   }
 
   @Roles([RoleTitleEnum.ADMIN, RoleTitleEnum.EDITOR])
@@ -115,17 +77,20 @@ export class UserController {
     @Param('id') id: number,
     @Req() req: UserInRequest,
   ) {
-    if (req.user.id !== id && !req.user.isAdmin)
-      throw new BadRequestException("You don't own this account");
+    this.userService.isOwnAccount(req.user.id !== id && !req.user.isAdmin);
+
     if (!req.user.isAdmin && updateProfile.roleid === RoleTitleEnum.ADMIN)
-      throw new BadRequestException('Can not update from user to admin!');
+      throw new BadRequestException(MESSAGE_CONSTANT.permission.notAllow);
 
     const existUsers = await this.userService.checkValidUser(id);
+
     let updateInfo = updateProfile;
     if (updateInfo.password)
       updateInfo.password = await argon2.hash(updateInfo.password);
     else delete updateInfo.password;
+
     delete existUsers.roles;
+
     const updateUser = await this.userService.updateUser({
       ...existUsers,
       ...updateInfo,
@@ -139,8 +104,8 @@ export class UserController {
   @UseGuards(AccessTokenGuard, PermissionGuard)
   @Put('/restore/:id')
   async restoreUser(@Param('id') id: number, @Req() req: UserInRequest) {
-    if (!req.user.isAdmin)
-      throw new BadRequestException("You don't own this account");
+    this.userService.isOwnAccount(!req.user.isAdmin);
+
     const existUsers = await this.userService.checkValidUser(id, true);
 
     const updateUser = await this.userService.updateUser({
@@ -184,7 +149,9 @@ export class UserController {
   @Delete('/:id')
   async deleteUser(@Param('id') id: number, @Req() req: UserInRequest) {
     if (req.user.id === id)
-      throw new BadRequestException('Can not delete your account!');
+      throw new BadRequestException(
+        MESSAGE_CONSTANT.user.badrequest.delete.self,
+      );
     const existUser = await this.userService.checkValidUser(id);
 
     const deleteUser = await this.userService.deleteUser(id);
